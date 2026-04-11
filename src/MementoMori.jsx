@@ -270,9 +270,9 @@ export default function MementoMori() {
         <div style={s.scene} className={exiting ? "scene-exit" : "scene-enter"}>
 
           <div style={s.glyphRow}>
-            <span className="breathe" style={{ fontSize:"1rem", color:"#a09080", animationDelay:"0s" }}>✦</span>
-            <span className="breathe" style={{ fontSize:"2rem", color:"#b0a090", animationDelay:"1.5s" }}>☽</span>
-            <span className="breathe" style={{ fontSize:"1rem", color:"#a09080", animationDelay:"3s" }}>✦</span>
+            <span className="breathe" style={{ fontSize:"1rem", color:"#c8b898", animationDelay:"0s" }}>✦</span>
+            <span className="breathe" style={{ fontSize:"2rem", color:"#d4c0a0", animationDelay:"1.5s" }}>☽</span>
+            <span className="breathe" style={{ fontSize:"1rem", color:"#c8b898", animationDelay:"3s" }}>✦</span>
           </div>
 
           <div style={s.titleWrap}>
@@ -328,7 +328,7 @@ export default function MementoMori() {
           </span>
 
           <div style={s.block}>
-            <p style={s.blockEyebrow}>YOU HAVE SURVIVED</p>
+            <p style={s.blockEyebrow}>CONGRATULATIONS, YOU HAVE SURVIVED</p>
             <div style={s.counterWrap}>
               <AnimDigits value={elapsed} mode={mode} />
             </div>
@@ -342,13 +342,13 @@ export default function MementoMori() {
           </div>
 
           <div style={{ ...s.block, ...s.blockFaded }}>
-            <p style={{ ...s.blockEyebrow, color:"#8a7e6e" }}>
-              BASED ON AVERAGE · YOU HAVE ~
+            <p style={{ ...s.blockEyebrow, color:"#b0a080" }}>
+              YOU HAVE LEFT ABOUT
             </p>
-            <div style={{ ...s.counterWrap, color:"#a09070" }}>
+            <div style={{ ...s.counterWrap, color:"#c8b480" }}>
               <AnimDigits value={remaining} mode={mode} />
             </div>
-            <p style={{ ...s.blockUnit, color:"#7a6e5e" }}>{curMode.label} REMAINING</p>
+            <p style={{ ...s.blockUnit, color:"#a89870" }}>{curMode.label} REMAINING</p>
             <p style={s.blockNote}>or you could die tomorrow — you never know</p>
           </div>
 
@@ -421,15 +421,15 @@ function BgCanvas() {
 }
 
 const s = {
-root: {
-  height: "100vh",
-  overflow: "hidden",
-  background: "#0c0c0c",
-  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-  position: "relative",
-  fontFamily: "'Courier New', monospace",
-  color: "#d8ccb8",
-},
+  root: {
+    height: "100vh",
+    overflow: "hidden",
+    background: "#0c0c0c",
+    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+    position: "relative",
+    fontFamily: "'Courier New', monospace",
+    color: "#d8ccb8",
+  },
   vignette: {
     position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none",
     background: "radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(0,0,0,0.88) 100%)",
@@ -438,11 +438,11 @@ root: {
     position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none", opacity: 0.4,
     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`,
   },
-scene: {
-  display: "flex", flexDirection: "column", alignItems: "center", gap: "1.2rem",
-  zIndex: 5, textAlign: "center", padding: "1rem 1.5rem",
-  maxWidth: 620, width: "100%",
-},
+  scene: {
+    display: "flex", flexDirection: "column", alignItems: "center", gap: "1.2rem",
+    zIndex: 5, textAlign: "center", padding: "1rem 1.5rem",
+    maxWidth: 620, width: "100%",
+  },
   glyphRow: { display: "flex", gap: "1.4rem", alignItems: "center" },
   titleWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" },
   titleRow: { display: "flex", alignItems: "center", gap: "1.2rem", width: "100%" },
@@ -453,10 +453,10 @@ scene: {
     textShadow: "0 0 60px rgba(220,200,160,0.15), 0 2px 4px rgba(0,0,0,0.8)",
   },
   titleSub: {
-    fontSize: "0.72rem", letterSpacing: "0.38em", color: "#7a7060", margin: 0,
+    fontSize: "0.72rem", letterSpacing: "0.38em", color: "#b8aa88", margin: 0,
   },
   question: {
-    fontSize: "0.85rem", letterSpacing: "0.12em", color: "#9a8e78", fontStyle: "italic",
+    fontSize: "0.85rem", letterSpacing: "0.12em", color: "#c4b490", fontStyle: "italic",
   },
   wheelOuter: {
     position: "relative", background: "rgba(255,255,255,0.025)",
@@ -464,7 +464,7 @@ scene: {
   },
   wheelLabels: {
     display: "flex", gap: 0, justifyContent: "space-between",
-    fontSize: "0.6rem", letterSpacing: "0.25em", color: "#6a6050",
+    fontSize: "0.6rem", letterSpacing: "0.25em", color: "#a89870",
     marginBottom: "0.4rem", paddingLeft: 2,
   },
   wheelRow: { display: "flex", alignItems: "center" },
@@ -483,12 +483,12 @@ scene: {
     cursor: "pointer", transition: "all 0.25s",
     marginTop: "0.4rem",
   },
-epigraph: {
-  fontSize: "0.68rem", fontStyle: "italic", lineHeight: 1.7,
-  color: "#6a6050", letterSpacing: "0.04em", maxWidth: 380,
-},
+  epigraph: {
+    fontSize: "0.68rem", fontStyle: "italic", lineHeight: 1.7,
+    color: "#8a7e68", letterSpacing: "0.04em", maxWidth: 380,
+  },
   dateDisplay: {
-    fontSize: "0.8rem", letterSpacing: "0.28em", color: "#7a7060",
+    fontSize: "0.8rem", letterSpacing: "0.28em", color: "#b0a080",
   },
   block: {
     display: "flex", flexDirection: "column", alignItems: "center", gap: "0.55rem",
@@ -502,7 +502,7 @@ epigraph: {
     border: "1px solid rgba(220,200,160,0.08)",
   },
   blockEyebrow: {
-    fontSize: "0.68rem", letterSpacing: "0.32em", color: "#9a8e78", margin: 0,
+    fontSize: "0.68rem", letterSpacing: "0.32em", color: "#c4b490", margin: 0,
   },
   counterWrap: {
     fontSize: "clamp(1.6rem, 5vw, 3rem)", fontWeight: "bold",
@@ -511,23 +511,23 @@ epigraph: {
     fontVariantNumeric: "tabular-nums",
   },
   blockUnit: {
-    fontSize: "0.65rem", letterSpacing: "0.45em", color: "#7a6e5e", margin: 0,
+    fontSize: "0.65rem", letterSpacing: "0.45em", color: "#a89870", margin: 0,
   },
   blockNote: {
     fontSize: "0.72rem", fontStyle: "italic", letterSpacing: "0.06em",
-    color: "#6a5e50", marginTop: "0.2rem",
+    color: "#a08870", marginTop: "0.2rem",
   },
   divider: {
     display: "flex", alignItems: "center", gap: "1rem",
     width: "75%", margin: "-0.5rem 0",
   },
   divLine: { flex: 1, height: 1, background: "rgba(220,200,160,0.15)" },
-  divText: { fontSize: "0.65rem", letterSpacing: "0.28em", color: "#6a6050" },
+  divText: { fontSize: "0.65rem", letterSpacing: "0.28em", color: "#a89870" },
   modeRow: { display: "flex", gap: "0.4rem", flexWrap: "wrap", justifyContent: "center" },
   modeBtn: {
     background: "transparent",
     border: "1px solid rgba(220,200,175,0.18)",
-    color: "#7a6e5e",
+    color: "#a89870",
     fontFamily: "'Courier New', monospace",
     fontSize: "0.65rem", letterSpacing: "0.2em",
     padding: "0.5rem 1.1rem",
@@ -542,23 +542,23 @@ epigraph: {
   },
   back: {
     background: "transparent", border: "none",
-    color: "#5a5044",
+    color: "#9a8e78",
     fontFamily: "'Courier New', monospace",
     fontSize: "0.7rem", letterSpacing: "0.15em",
     cursor: "pointer", transition: "color 0.2s", padding: "0.3rem",
   },
   quote: {
     fontSize: "0.72rem", fontStyle: "italic",
-    color: "#5a5044", letterSpacing: "0.05em",
+    color: "#8a7e68", letterSpacing: "0.05em",
     maxWidth: 360, lineHeight: 2,
   },
-footer: {
-  position: "relative",
-  fontSize: "0.55rem", letterSpacing: "0.38em",
-  color: "#3a3428", zIndex: 6,
-  marginTop: "1rem",
-  paddingBottom: "1.5rem",
-},
+  footer: {
+    position: "relative",
+    fontSize: "0.55rem", letterSpacing: "0.38em",
+    color: "#7a6e58", zIndex: 6,
+    marginTop: "1rem",
+    paddingBottom: "1.5rem",
+  },
 };
 
 const css = `
@@ -574,8 +574,8 @@ const css = `
     to   { opacity:0; transform:translateY(-22px); filter:blur(8px); }
   }
   @keyframes breathe {
-    0%,100% { opacity:0.45; transform:scale(1); }
-    50%     { opacity:0.75; transform:scale(1.08); }
+    0%,100% { opacity:0.55; transform:scale(1); }
+    50%     { opacity:0.85; transform:scale(1.08); }
   }
 
   .scene-enter { animation: enter 0.8s cubic-bezier(0.16,1,0.3,1) forwards; }
@@ -590,9 +590,9 @@ const css = `
   }
   .mode-btn:hover {
     border-color: rgba(220,200,160,0.4) !important;
-    color: #b0a080 !important;
+    color: #c8b888 !important;
   }
-  .back-btn:hover { color: #9a8e78 !important; }
+  .back-btn:hover { color: #c4b490 !important; }
 
   div[style*="overflowY"]::-webkit-scrollbar,
   div[style*="overflow-y"]::-webkit-scrollbar { display: none; }
