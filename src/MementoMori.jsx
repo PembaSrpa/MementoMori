@@ -329,7 +329,7 @@ export default function MementoMori() {
           </span>
 
           <div style={s.block}>
-            <p style={s.blockEyebrow}>CONGRATULATIONS, YOU HAVE SURVIVED</p>
+            <p style={s.blockEyebrow}>YOU HAVE SURVIVED</p>
             <div style={s.counterWrap}>
               <AnimDigits value={elapsed} mode={mode} />
             </div>
