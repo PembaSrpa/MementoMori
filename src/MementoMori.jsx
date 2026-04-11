@@ -202,9 +202,9 @@ const YEARS_ARR = Array.from({ length: 105 }, (_, i) => now.getFullYear() - i);
 
 export default function MementoMori() {
   const [phase, setPhase] = useState("input");
-  const [monthIdx, setMonthIdx] = useState(0);
-  const [day, setDay] = useState(1);
-  const [year, setYear] = useState(1995);
+  const [monthIdx, setMonthIdx] = useState(11);
+  const [day, setDay] = useState(22);
+  const [year, setYear] = useState(2002);
   const [mode, setMode] = useState("seconds");
   const [elapsed, setElapsed] = useState(0);
   const [remaining, setRemaining] = useState(0);
@@ -371,9 +371,10 @@ export default function MementoMori() {
       )}
 
       <div style={s.footer}>✦ MEMENTO MORI ✦ TEMPUS FUGIT ✦ CARPE DIEM ✦ <br /> 
-        <span style={s.quote}>✦ made by <Link href="https://artt-folio.vercel.app/" target="_blank" rel="noopener noreferrer">
-          <span className="back-btn">pemba sherpa</span></Link> 
-            ← ✦
+        <span style={s.quote}>made by <Link href="https://artt-folio.vercel.app/" target="_blank" rel="noopener noreferrer">
+          
+          <span className="face-btn ">pemba sherpa</span></Link> 
+            ←
           </span>
       </div>
       <div style={s.footer}></div>
