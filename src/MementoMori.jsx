@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 
 const MODES = [
   { key: "seconds", label: "SECONDS" },
@@ -369,7 +370,13 @@ export default function MementoMori() {
         </div>
       )}
 
-      <div style={s.footer}>✦ MEMENTO MORI ✦ TEMPUS FUGIT ✦ CARPE DIEM ✦</div>
+      <div style={s.footer}>✦ MEMENTO MORI ✦ TEMPUS FUGIT ✦ CARPE DIEM ✦ <br /> 
+        <span style={s.quote}>✦ made by <Link href="https://artt-folio.vercel.app/" target="_blank" rel="noopener noreferrer">
+          <span className="back-btn">pemba sherpa</span></Link> 
+            ← ✦
+          </span>
+      </div>
+      <div style={s.footer}></div>
     </div>
   );
 }
@@ -551,6 +558,7 @@ const s = {
     fontSize: "0.72rem", fontStyle: "italic",
     color: "#8a7e68", letterSpacing: "0.05em",
     maxWidth: 360, lineHeight: 2,
+    alignItems: "center", display: "flex", gap: "0.3rem", justifyContent: "center",
   },
   footer: {
     position: "relative",
