@@ -305,11 +305,6 @@ export default function MementoMori() {
           <button onClick={handleReveal} className="face-btn" style={s.faceBtn}>
             FACE YOUR TIME
           </button>
-
-          <p style={s.epigraph}>
-            "It is not that we have a short time to live,<br/>
-            but that we waste a great deal of it." — Seneca
-          </p>
         </div>
       )}
 
@@ -323,6 +318,11 @@ export default function MementoMori() {
               pointerEvents:"none", zIndex:1,
             }} />
           ))}
+
+          <p style={s.epigraph}>
+            "It is not that we have a short time to live,<br/>
+            but that we waste a great deal of it." — Seneca
+          </p>
 
           <span style={s.dateDisplay}>
             {MONTH_FULL[monthIdx]} {String(day).padStart(2,"0")}, {year}
@@ -377,7 +377,6 @@ export default function MementoMori() {
             ←
           </span>
       </div>
-      <div style={s.footer}></div>
     </div>
   );
 }
