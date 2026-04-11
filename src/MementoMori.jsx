@@ -282,7 +282,7 @@ export default function MementoMori() {
               <h1 style={s.title}>MEMENTO MORI</h1>
               <div style={s.titleLine} />
             </div>
-            <p style={s.titleSub}>remember · you · will · die</p>
+            <p style={s.titleSub}>remember · you · must · die</p>
           </div>
 
           <p style={s.question}>when were you summoned into existence?</p>
@@ -350,7 +350,7 @@ export default function MementoMori() {
               <AnimDigits value={remaining} mode={mode} />
             </div>
             <p style={{ ...s.blockUnit, color:"#a89870" }}>{curMode.label} REMAINING</p>
-            <p style={s.blockNote}>or you could die tomorrow — you never know</p>
+            <p style={s.blockNote}>or you could die tomorrow - you never know</p>
           </div>
 
           <div style={s.modeRow}>
@@ -365,7 +365,7 @@ export default function MementoMori() {
           <button onClick={reset} style={s.back} className="back-btn">← begin again</button>
 
           <p style={s.quote}>
-            "The hour which you give to another is taken from your life."
+            "The time which you give to another is taken from your life."
           </p>
         </div>
       )}
