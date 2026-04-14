@@ -48,6 +48,32 @@ function useRaf(cb, active) {
   }, [active]);
 }
 
+function useScaleFit(ref, deps = []) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const fit = () => {
+      el.style.transform = "";
+      el.style.marginBottom = "";
+      const h = el.getBoundingClientRect().height;
+      const w = el.getBoundingClientRect().width;
+      const vh = window.innerHeight;
+      const vw = window.innerWidth;
+      const scaleH = h > vh ? vh / h : 1;
+      const scaleW = w > vw ? vw / w : 1;
+      const scale = Math.min(scaleH, scaleW);
+      if (scale < 1) {
+        el.style.transform = `scale(${scale})`;
+        el.style.transformOrigin = "top center";
+        el.style.marginBottom = `-${h - h * scale}px`;
+      }
+    };
+    const id = setTimeout(fit, 50);
+    window.addEventListener("resize", fit);
+    return () => { clearTimeout(id); window.removeEventListener("resize", fit); };
+  }, deps);
+}
+
 function Digit({ ch }) {
   const [anim, setAnim] = useState(false);
   const p = useRef(ch);
@@ -212,6 +238,9 @@ export default function MementoMori() {
   const [exiting, setExiting] = useState(false);
   const [particles, setParticles] = useState([]);
 
+  const sceneRef = useRef(null);
+  useScaleFit(sceneRef, [phase]);
+
   const maxDay = daysIn(monthIdx, year);
   const dayArr = Array.from({ length: maxDay }, (_, i) => i + 1);
 
@@ -268,7 +297,7 @@ export default function MementoMori() {
       <Corner pos="tl" /><Corner pos="tr" /><Corner pos="bl" /><Corner pos="br" />
 
       {phase === "input" && (
-        <div style={s.scene} className={exiting ? "scene-exit" : "scene-enter"}>
+        <div ref={sceneRef} style={s.scene} className={exiting ? "scene-exit" : "scene-enter"}>
 
           <div style={s.glyphRow}>
             <span className="breathe" style={{ fontSize:"1rem", color:"#c8b898", animationDelay:"0s" }}>✦</span>
@@ -309,7 +338,7 @@ export default function MementoMori() {
       )}
 
       {phase === "reveal" && (
-        <div style={s.scene} className={exiting ? "scene-exit" : "scene-enter"}>
+        <div ref={sceneRef} style={s.scene} className={exiting ? "scene-exit" : "scene-enter"}>
           {particles.map(p => (
             <div key={p.id} style={{
               position:"fixed", left:`${p.x}%`, top:`${p.y}%`,
@@ -370,10 +399,9 @@ export default function MementoMori() {
         </div>
       )}
 
-      <div style={s.footer}>✦ MEMENTO MORI ✦ TEMPUS FUGIT ✦ CARPE DIEM ✦ <br /> 
+      <div style={s.footer}>✦ MEMENTO MORI ✦ TEMPUS FUGIT ✦ CARPE DIEM ✦ <br />
         <span style={s.quote}>made by <Link href="https://artt-folio.vercel.app/" target="_blank" rel="noopener noreferrer">
-          
-          <span className="face-btn ">pemba sherpa</span></Link> 
+          <span className="face-btn">pemba sherpa</span></Link>
             ←
           </span>
       </div>
