@@ -277,14 +277,6 @@ function Lever({ onPull }) {
             borderRadius: 2,
           }} />
         </div>
-
-        {/* PULL label */}
-        <div style={{
-          position: "absolute", bottom: 2,
-          fontSize: "0.48rem", letterSpacing: "0.2em",
-          color: "rgba(180,160,120,0.45)",
-          fontFamily: "'Courier New', monospace",
-        }}>PULL</div>
       </div>
     </div>
   );
@@ -387,7 +379,6 @@ export default function MementoMori() {
               <span style={{ width: 96, textAlign:"center" }}>MONTH</span>
               <span style={{ width: 76, textAlign:"center" }}>DAY</span>
               <span style={{ width: 88, textAlign:"center" }}>YEAR</span>
-              {/* spacer to align with lever */}
               <span style={{ width: 56 }} />
             </div>
             <div style={s.wheelRow}>
@@ -397,7 +388,6 @@ export default function MementoMori() {
               <div style={s.wheelSep} />
               <DrumWheel values={YEARS_ARR} selected={year} onChange={setYear} fmt={v=>String(v)} width={88} />
               <div style={s.wheelSep} />
-              {/* ── LEVER replaces the button ── */}
               <Lever onPull={handleReveal} />
             </div>
           </div>
@@ -420,7 +410,7 @@ export default function MementoMori() {
 
             <p style={s.epigraph}>
               "It is not that we have a short time to live,<br/>
-              but that we waste a great deal of it." — Seneca
+              but that we waste a great deal of it." - Seneca
             </p>
 
             <span style={s.dateDisplay}>
