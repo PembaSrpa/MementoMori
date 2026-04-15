@@ -549,7 +549,6 @@ const s = {
     maxWidth: 620, width: "100%",
   },
 
-  glyphRow: { display: "flex", gap: "1.4rem", alignItems: "center" },
   titleWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" },
   titleRow: { display: "flex", alignItems: "center", gap: "1.2rem", width: "100%" },
   titleLine: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(220,200,160,0.4), transparent)" },
@@ -579,10 +578,10 @@ const s = {
     background: "linear-gradient(to bottom, transparent, rgba(220,200,160,0.2), transparent)",
     margin: "0 0.15rem",
   },
-  epigraph: {
-    fontSize: "0.68rem", fontStyle: "italic", lineHeight: 1.7,
-    color: "#8a7e68", letterSpacing: "0.04em", maxWidth: 380,
-  },
+  // epigraph: {
+  //   fontSize: "0.68rem", fontStyle: "italic", lineHeight: 1.7,
+  //   color: "#8a7e68", letterSpacing: "0.04em", maxWidth: 380,
+  // },
   dateDisplay: {
     fontSize: "0.8rem", letterSpacing: "0.28em", color: "#b0a080",
   },
