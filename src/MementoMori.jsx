@@ -48,32 +48,6 @@ function useRaf(cb, active) {
   }, [active]);
 }
 
-function useScaleFit(ref, deps = []) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const fit = () => {
-      el.style.transform = "";
-      el.style.marginBottom = "";
-      const h = el.getBoundingClientRect().height;
-      const w = el.getBoundingClientRect().width;
-      const vh = window.innerHeight;
-      const vw = window.innerWidth;
-      const scaleH = h > vh ? vh / h : 1;
-      const scaleW = w > vw ? vw / w : 1;
-      const scale = Math.min(scaleH, scaleW);
-      if (scale < 1) {
-        el.style.transform = `scale(${scale})`;
-        el.style.transformOrigin = "top center";
-        el.style.marginBottom = `-${h - h * scale}px`;
-      }
-    };
-    const id = setTimeout(fit, 50);
-    window.addEventListener("resize", fit);
-    return () => { clearTimeout(id); window.removeEventListener("resize", fit); };
-  }, deps);
-}
-
 function Digit({ ch }) {
   const [anim, setAnim] = useState(false);
   const p = useRef(ch);
@@ -223,6 +197,100 @@ function DrumWheel({ values, selected, onChange, fmt, width = 88 }) {
   );
 }
 
+// ── Slot-machine lever ──────────────────────────────────────────────────────
+function Lever({ onPull }) {
+  const [pulling, setPulling] = useState(false);
+
+  const handleClick = () => {
+    if (pulling) return;
+    setPulling(true);
+    setTimeout(() => {
+      setPulling(false);
+      onPull();
+    }, 520);
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      title="Pull to reveal"
+      style={{
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", width: 52, flexShrink: 0,
+        height: ITEM_H * 5, cursor: "pointer", userSelect: "none",
+        marginLeft: 4,
+      }}
+    >
+      {/* track / rail */}
+      <div style={{
+        position: "relative", width: 52, height: ITEM_H * 5,
+        display: "flex", flexDirection: "column", alignItems: "center",
+      }}>
+        {/* vertical rail */}
+        <div style={{
+          position: "absolute", left: "50%", top: 10, bottom: 10,
+          width: 5, transform: "translateX(-50%)",
+          background: "rgba(180,160,120,0.2)",
+          borderRadius: 3,
+          border: "0.5px solid rgba(220,200,160,0.25)",
+        }} />
+
+        {/* base notch */}
+        <div style={{
+          position: "absolute", bottom: 18, left: "50%",
+          transform: "translateX(-50%)",
+          width: 14, height: 22, borderRadius: 7,
+          background: "rgba(100,85,60,0.7)",
+          border: "1px solid rgba(220,200,160,0.3)",
+        }} />
+
+        {/* arm + knob — animated */}
+        <div style={{
+          position: "absolute",
+          left: "50%",
+          top: pulling ? "62%" : "14%",
+          transform: "translateX(-50%)",
+          transition: pulling
+            ? "top 0.22s cubic-bezier(.4,0,.2,1)"
+            : "top 0.28s cubic-bezier(.2,1.4,.4,1)",
+          display: "flex", flexDirection: "column", alignItems: "center",
+          zIndex: 2,
+        }}>
+          {/* knob */}
+          <div style={{
+            width: 28, height: 28, borderRadius: "50%",
+            background: "radial-gradient(circle at 38% 35%, rgba(220,200,160,0.18), rgba(50,42,28,0.95))",
+            border: "1px solid rgba(220,200,160,0.5)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "inset 0 1px 2px rgba(220,200,160,0.1)",
+          }}>
+            <div style={{
+              width: 8, height: 8, borderRadius: "50%",
+              background: "rgba(220,200,160,0.35)",
+              border: "0.5px solid rgba(220,200,160,0.5)",
+            }} />
+          </div>
+          {/* stem */}
+          <div style={{
+            width: 4, height: 44,
+            background: "linear-gradient(to bottom, rgba(200,180,140,0.7), rgba(160,140,100,0.4))",
+            borderRadius: 2,
+          }} />
+        </div>
+
+        {/* PULL label */}
+        <div style={{
+          position: "absolute", bottom: 2,
+          fontSize: "0.48rem", letterSpacing: "0.2em",
+          color: "rgba(180,160,120,0.45)",
+          fontFamily: "'Courier New', monospace",
+        }}>PULL</div>
+      </div>
+    </div>
+  );
+}
+// ───────────────────────────────────────────────────────────────────────────
+
 const now = new Date();
 const YEARS_ARR = Array.from({ length: 105 }, (_, i) => now.getFullYear() - i);
 
@@ -237,9 +305,6 @@ export default function MementoMori() {
   const [birthTs, setBirthTs] = useState(null);
   const [exiting, setExiting] = useState(false);
   const [particles, setParticles] = useState([]);
-
-  const sceneRef = useRef(null);
-  useScaleFit(sceneRef, [phase]);
 
   const maxDay = daysIn(monthIdx, year);
   const dayArr = Array.from({ length: maxDay }, (_, i) => i + 1);
@@ -296,8 +361,9 @@ export default function MementoMori() {
       <div style={s.grain} />
       <Corner pos="tl" /><Corner pos="tr" /><Corner pos="bl" /><Corner pos="br" />
 
+      {/* ── INPUT PAGE ── */}
       {phase === "input" && (
-        <div ref={sceneRef} style={s.scene} className={exiting ? "scene-exit" : "scene-enter"}>
+        <div style={s.inputScene} className={exiting ? "scene-exit" : "scene-enter"}>
 
           <div style={s.glyphRow}>
             <span className="breathe" style={{ fontSize:"1rem", color:"#c8b898", animationDelay:"0s" }}>✦</span>
@@ -321,6 +387,8 @@ export default function MementoMori() {
               <span style={{ width: 96, textAlign:"center" }}>MONTH</span>
               <span style={{ width: 76, textAlign:"center" }}>DAY</span>
               <span style={{ width: 88, textAlign:"center" }}>YEAR</span>
+              {/* spacer to align with lever */}
+              <span style={{ width: 56 }} />
             </div>
             <div style={s.wheelRow}>
               <DrumWheel values={Array.from({length:12},(_,i)=>i)} selected={monthIdx} onChange={setMonthIdx} fmt={v=>MONTHS[v]} width={96} />
@@ -328,74 +396,77 @@ export default function MementoMori() {
               <DrumWheel values={dayArr} selected={day} onChange={setDay} fmt={v=>String(v).padStart(2,"0")} width={76} />
               <div style={s.wheelSep} />
               <DrumWheel values={YEARS_ARR} selected={year} onChange={setYear} fmt={v=>String(v)} width={88} />
+              <div style={s.wheelSep} />
+              {/* ── LEVER replaces the button ── */}
+              <Lever onPull={handleReveal} />
             </div>
           </div>
 
-          <button onClick={handleReveal} className="face-btn" style={s.faceBtn}>
-            FACE YOUR TIME
-          </button>
         </div>
       )}
 
+      {/* ── REVEAL PAGE — scrollable ── */}
       {phase === "reveal" && (
-        <div ref={sceneRef} style={s.scene} className={exiting ? "scene-exit" : "scene-enter"}>
-          {particles.map(p => (
-            <div key={p.id} style={{
-              position:"fixed", left:`${p.x}%`, top:`${p.y}%`,
-              width:p.size, height:p.size, borderRadius:"50%",
-              background:"#c8b898", opacity:p.opacity,
-              pointerEvents:"none", zIndex:1,
-            }} />
-          ))}
-
-          <p style={s.epigraph}>
-            "It is not that we have a short time to live,<br/>
-            but that we waste a great deal of it." — Seneca
-          </p>
-
-          <span style={s.dateDisplay}>
-            {MONTH_FULL[monthIdx]} {String(day).padStart(2,"0")}, {year}
-          </span>
-
-          <div style={s.block}>
-            <p style={s.blockEyebrow}>YOU HAVE SURVIVED</p>
-            <div style={s.counterWrap}>
-              <AnimDigits value={elapsed} mode={mode} />
-            </div>
-            <p style={s.blockUnit}>{curMode.label}</p>
-          </div>
-
-          <div style={s.divider}>
-            <div style={s.divLine} />
-            <span style={s.divText}>& YET</span>
-            <div style={s.divLine} />
-          </div>
-
-          <div style={{ ...s.block, ...s.blockFaded }}>
-            <p style={{ ...s.blockEyebrow, color:"#b0a080" }}>
-              YOU HAVE LEFT ABOUT
-            </p>
-            <div style={{ ...s.counterWrap, color:"#c8b480" }}>
-              <AnimDigits value={remaining} mode={mode} />
-            </div>
-            <p style={{ ...s.blockUnit, color:"#a89870" }}>{curMode.label} REMAINING</p>
-            <p style={s.blockNote}>or you could die tomorrow - you never know</p>
-          </div>
-
-          <div style={s.modeRow}>
-            {MODES.map(m => (
-              <button key={m.key} onClick={() => setMode(m.key)} className="mode-btn"
-                style={{ ...s.modeBtn, ...(mode === m.key ? s.modeBtnOn : {}) }}>
-                {m.label}
-              </button>
+        <div style={s.revealScroll} className={exiting ? "scene-exit" : "scene-enter"}>
+          <div style={s.revealInner}>
+            {particles.map(p => (
+              <div key={p.id} style={{
+                position:"fixed", left:`${p.x}%`, top:`${p.y}%`,
+                width:p.size, height:p.size, borderRadius:"50%",
+                background:"#c8b898", opacity:p.opacity,
+                pointerEvents:"none", zIndex:1,
+              }} />
             ))}
+
+            <p style={s.epigraph}>
+              "It is not that we have a short time to live,<br/>
+              but that we waste a great deal of it." — Seneca
+            </p>
+
+            <span style={s.dateDisplay}>
+              {MONTH_FULL[monthIdx]} {String(day).padStart(2,"0")}, {year}
+            </span>
+
+            <div style={s.block}>
+              <p style={s.blockEyebrow}>YOU HAVE SURVIVED</p>
+              <div style={s.counterWrap}>
+                <AnimDigits value={elapsed} mode={mode} />
+              </div>
+              <p style={s.blockUnit}>{curMode.label}</p>
+            </div>
+
+            <div style={s.divider}>
+              <div style={s.divLine} />
+              <span style={s.divText}>& YET</span>
+              <div style={s.divLine} />
+            </div>
+
+            <div style={{ ...s.block, ...s.blockFaded }}>
+              <p style={{ ...s.blockEyebrow, color:"#b0a080" }}>
+                YOU HAVE LEFT ABOUT
+              </p>
+              <div style={{ ...s.counterWrap, color:"#c8b480" }}>
+                <AnimDigits value={remaining} mode={mode} />
+              </div>
+              <p style={{ ...s.blockUnit, color:"#a89870" }}>{curMode.label} REMAINING</p>
+              <p style={s.blockNote}>or you could die tomorrow - you never know</p>
+            </div>
+
+            <div style={s.modeRow}>
+              {MODES.map(m => (
+                <button key={m.key} onClick={() => setMode(m.key)} className="mode-btn"
+                  style={{ ...s.modeBtn, ...(mode === m.key ? s.modeBtnOn : {}) }}>
+                  {m.label}
+                </button>
+              ))}
+            </div>
+
+            <button onClick={reset} style={s.back} className="back-btn">← begin again</button>
+
+            <p style={s.quote}>
+              "The time which you give to another is taken from your life."
+            </p>
           </div>
-
-          <button onClick={reset} style={s.back} className="back-btn">← begin again</button>
-
-          <p style={s.quote}>
-            "The time which you give to another is taken from your life."
-          </p>
         </div>
       )}
 
@@ -455,15 +526,17 @@ function BgCanvas() {
   return <canvas id="mm-bg" style={{ position:"fixed", inset:0, width:"100%", height:"100%", pointerEvents:"none", zIndex:0 }} />;
 }
 
+const ITEM_H_CONST = ITEM_H; // alias for use in styles below
+
 const s = {
   root: {
-    height: "100vh",
-    overflow: "hidden",
+    minHeight: "100vh",
     background: "#0c0c0c",
     display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
     position: "relative",
     fontFamily: "'Courier New', monospace",
     color: "#d8ccb8",
+    // NOT overflow:hidden — lets the reveal page scroll naturally
   },
   vignette: {
     position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none",
@@ -473,11 +546,32 @@ const s = {
     position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none", opacity: 0.4,
     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`,
   },
-  scene: {
+
+  // Input page — centred, no scroll needed (lever removed the button height)
+  inputScene: {
     display: "flex", flexDirection: "column", alignItems: "center", gap: "1.2rem",
     zIndex: 5, textAlign: "center", padding: "1rem 1.5rem",
+    maxWidth: 640, width: "100%",
+    // vertically centred by the root flexbox
+  },
+
+  // Reveal page — full-page scroll container
+  revealScroll: {
+    width: "100%",
+    maxHeight: "100vh",
+    overflowY: "auto",
+    WebkitOverflowScrolling: "touch",
+    zIndex: 5,
+    display: "flex", justifyContent: "center",
+    // hide scrollbar
+    scrollbarWidth: "none",
+  },
+  revealInner: {
+    display: "flex", flexDirection: "column", alignItems: "center", gap: "1.2rem",
+    textAlign: "center", padding: "2rem 1.5rem 3rem",
     maxWidth: 620, width: "100%",
   },
+
   glyphRow: { display: "flex", gap: "1.4rem", alignItems: "center" },
   titleWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" },
   titleRow: { display: "flex", alignItems: "center", gap: "1.2rem", width: "100%" },
@@ -498,7 +592,7 @@ const s = {
     border: "1px solid rgba(220,200,160,0.2)", padding: "1rem 1.2rem 0.8rem",
   },
   wheelLabels: {
-    display: "flex", gap: 0, justifyContent: "space-between",
+    display: "flex", gap: 0,
     fontSize: "0.6rem", letterSpacing: "0.25em", color: "#a89870",
     marginBottom: "0.4rem", paddingLeft: 2,
   },
@@ -507,16 +601,6 @@ const s = {
     width: 1, height: ITEM_H * 3,
     background: "linear-gradient(to bottom, transparent, rgba(220,200,160,0.2), transparent)",
     margin: "0 0.15rem",
-  },
-  faceBtn: {
-    background: "transparent",
-    border: "1px solid rgba(220,200,160,0.45)",
-    color: "#c8b898",
-    fontFamily: "'Courier New', monospace",
-    fontSize: "0.78rem", letterSpacing: "0.3em",
-    padding: "0.9rem 2.8rem",
-    cursor: "pointer", transition: "all 0.25s",
-    marginTop: "0.4rem",
   },
   epigraph: {
     fontSize: "0.68rem", fontStyle: "italic", lineHeight: 1.7,
@@ -630,6 +714,7 @@ const css = `
   }
   .back-btn:hover { color: #c4b490 !important; }
 
+  /* hide scrollbar on reveal page */
   div[style*="overflowY"]::-webkit-scrollbar,
   div[style*="overflow-y"]::-webkit-scrollbar { display: none; }
 
