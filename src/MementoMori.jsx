@@ -356,13 +356,6 @@ export default function MementoMori() {
       {/* ── INPUT PAGE ── */}
       {phase === "input" && (
         <div style={s.inputScene} className={exiting ? "scene-exit" : "scene-enter"}>
-
-          <div style={s.glyphRow}>
-            <span className="breathe" style={{ fontSize:"1rem", color:"#c8b898", animationDelay:"0s" }}>✦</span>
-            <span className="breathe" style={{ fontSize:"2rem", color:"#d4c0a0", animationDelay:"1.5s" }}>☽</span>
-            <span className="breathe" style={{ fontSize:"1rem", color:"#c8b898", animationDelay:"3s" }}>✦</span>
-          </div>
-
           <div style={s.titleWrap}>
             <div style={s.titleRow}>
               <div style={s.titleLine} />
@@ -407,12 +400,6 @@ export default function MementoMori() {
                 pointerEvents:"none", zIndex:1,
               }} />
             ))}
-
-            <p style={s.epigraph}>
-              "It is not that we have a short time to live,<br/>
-              but that we waste a great deal of it." - Seneca
-            </p>
-
             <span style={s.dateDisplay}>
               {MONTH_FULL[monthIdx]} {String(day).padStart(2,"0")}, {year}
             </span>
