@@ -609,7 +609,7 @@ const s = {
   },
   blockNote: {
     fontSize: "0.72rem", fontStyle: "italic", letterSpacing: "0.06em",
-    color: "#a08870", marginTop: "0.2rem",
+    color: "#c8ae95", marginTop: "0.2rem",
   },
   divider: {
     display: "flex", alignItems: "center", gap: "1rem",
@@ -636,21 +636,21 @@ const s = {
   },
   back: {
     background: "transparent", border: "none",
-    color: "#9a8e78",
+    color: "#ab9f88",
     fontFamily: "'Courier New', monospace",
     fontSize: "0.7rem", letterSpacing: "0.15em",
     cursor: "pointer", transition: "color 0.2s", padding: "0.3rem",
   },
   quote: {
     fontSize: "0.72rem", fontStyle: "italic",
-    color: "#8a7e68", letterSpacing: "0.05em",
+    color: "#dfd4bf", letterSpacing: "0.05em",
     maxWidth: 360, lineHeight: 2,
     alignItems: "center", display: "flex", gap: "0.3rem", justifyContent: "center",
   },
   footer: {
     position: "relative",
     fontSize: "0.55rem", letterSpacing: "0.38em",
-    color: "#7a6e58", zIndex: 6,
+    color: "#c8bca6", zIndex: 6,
     marginTop: "1rem",
     paddingBottom: "1.5rem",
   },
