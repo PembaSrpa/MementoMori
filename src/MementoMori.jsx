@@ -547,8 +547,8 @@ const s = {
     scrollbarWidth: "none",
   },
   revealInner: {
-    display: "flex", flexDirection: "column", alignItems: "center", gap: "1.2rem",
-    textAlign: "center", padding: "2rem 1.5rem 3rem",
+    display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem",
+    textAlign: "center", padding: "1.2rem 1.5rem 2rem",
     maxWidth: 620, width: "100%",
   },
 
@@ -585,8 +585,8 @@ const s = {
     fontSize: "0.8rem", letterSpacing: "0.28em", color: "#b0a080",
   },
   block: {
-    display: "flex", flexDirection: "column", alignItems: "center", gap: "0.55rem",
-    padding: "1.6rem 2rem",
+    display: "flex", flexDirection: "column", alignItems: "center", gap: "0.2rem",
+    padding: "1rem 2rem",
     background: "rgba(255,255,255,0.025)",
     border: "1px solid rgba(220,200,160,0.15)",
     width: "100%",
@@ -613,11 +613,11 @@ const s = {
   },
   divider: {
     display: "flex", alignItems: "center", gap: "1rem",
-    width: "75%", margin: "-0.5rem 0",
+    width: "75%", margin: "-0.2rem 0",
   },
   divLine: { flex: 1, height: 1, background: "rgba(220,200,160,0.15)" },
   divText: { fontSize: "0.65rem", letterSpacing: "0.28em", color: "#a89870" },
-  modeRow: { display: "flex", gap: "0.4rem", flexWrap: "wrap", justifyContent: "center" },
+  modeRow: { display: "flex", gap: "0.3rem", flexWrap: "wrap", justifyContent: "center" },
   modeBtn: {
     background: "transparent",
     border: "1px solid rgba(220,200,175,0.18)",
