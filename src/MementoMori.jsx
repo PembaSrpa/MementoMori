@@ -105,7 +105,10 @@ function DrumWheel({ values, selected, onChange, fmt, width = 88 }) {
     ref.current.scrollTo({ top: i * ITEM_H, behavior: smooth ? "smooth" : "instant" });
   }, []);
 
-  useEffect(() => { scrollTo(idx, false); }, []);
+  useEffect(() => {
+  const t = setTimeout(() => scrollTo(idx, false), 50);
+  return () => clearTimeout(t);
+}, [idx]);
 
   const commitScroll = useCallback(() => {
     if (!ref.current) return;
