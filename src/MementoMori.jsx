@@ -673,7 +673,7 @@ const s = {
   },
   footer: {
     position: "relative",
-    fontSize: "0.60rem", letterSpacing: "0.35em",
+    fontSize: "0.60rem", letterSpacing: "0.30em",
     color: "var(--c-mid)", zIndex: 6,
     marginTop: "1rem",
     paddingBottom: "1.5rem",
@@ -693,7 +693,7 @@ const css = `
     --c-fg:            #f0e8d8;
     --c-mid:           #c4b490;
     --c-muted:         #a89870;
-    --c-faint:         rgba(220,200,175,0.28);
+    --c-faint:         rgba(220, 200, 175, 0.69);
     --c-border:        rgba(220,200,160,0.14);
     --c-border-strong: rgba(220,200,160,0.4);
     --c-gold:          #d4b44a;
