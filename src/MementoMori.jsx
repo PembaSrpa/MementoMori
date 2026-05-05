@@ -448,6 +448,9 @@ export default function MementoMori() {
       {phase === "reveal" && (
         <div style={s.revealScroll} className={`mm-reveal-scroll${exiting ? " scene-exit" : " scene-enter"}`}>
           <div style={s.revealInner}>
+            <div style={s.footer}>
+              * VIVAMUS MORIENDUM EST *
+            </div>
             <span style={s.dateDisplay}>
               {MONTH_FULL[monthIdx]} {String(day).padStart(2, "0")}, {year}
             </span>
@@ -487,7 +490,7 @@ export default function MementoMori() {
                 <AnimDigits value={remaining} mode={mode} />
               </div>
               <p style={{ ...s.blockUnit, color: "var(--c-gold-faint)" }}>{curMode.label} REMAINING</p>
-              <p style={s.blockNote}>or you could die tomorrow — you never know</p>
+              <p style={s.blockNote}>or you could die tomorrow - you never know</p>
             </div>
 
             <button onClick={reset} style={s.back} className="back-btn">← begin again</button>
@@ -500,7 +503,7 @@ export default function MementoMori() {
       )}
 
       <div style={s.footer}>
-        ✦ MEMENTO MORI ✦ TEMPUS FUGIT ✦ CARPE DIEM ✦<br />
+        * MEMENTO MORI * TEMPUS FUGIT * CARPE DIEM *<br />
         <span style={s.footerBy}>made by <Link href="https://artt-folio.vercel.app/" target="_blank" rel="noopener noreferrer">
           <span className="face-btn">pemba sherpa</span>
         </Link></span>
@@ -670,7 +673,7 @@ const s = {
   },
   footer: {
     position: "relative",
-    fontSize: "0.53rem", letterSpacing: "0.35em",
+    fontSize: "0.63rem", letterSpacing: "0.35em",
     color: "var(--c-mid)", zIndex: 6,
     marginTop: "1rem",
     paddingBottom: "1.5rem",
