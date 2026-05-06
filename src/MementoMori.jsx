@@ -504,7 +504,7 @@ export default function MementoMori() {
 
       <div style={s.footer}>
         * MEMENTO MORI * TEMPUS FUGIT * CARPE DIEM *<br />
-        <span style={s.footerBy}>made by <Link href="https://artt-folio.vercel.app/" target="_blank" rel="noopener noreferrer">
+        <span style={s.footerBy}>made by <Link href="https://artt-folio.vercel.app/" target="_self" rel="noopener noreferrer">
           <span className="face-btn">pemba sherpa</span>
         </Link></span>
       </div>
