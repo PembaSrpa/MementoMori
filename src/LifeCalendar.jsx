@@ -330,8 +330,8 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
           color: #e8dcc8;
           font-family: Courier New, monospace;
           font-size: clamp(0.7rem, 1.2vw, 0.85rem);
-          letter-spacing: 0.15em;
-          padding: 0.5rem 1.4rem;
+          letter-spacing: 0.12em;
+          padding: 0.5rem 1.0rem;
           cursor: pointer;
           transition: all 0.18s;
           font-weight: 600;
@@ -462,7 +462,7 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
 
         {/* footer */}
         <div style={{
-          fontSize: "0.65rem", letterSpacing: "0.28em",
+          fontSize: "0.60rem", letterSpacing: "0.24em",
           color: "#c4b490", textAlign: "center", lineHeight: 2,
         }}>
           * MEMENTO MORI * TEMPUS FUGIT * CARPE DIEM *<br />
