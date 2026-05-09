@@ -566,7 +566,7 @@ const s = {
   divider: { display: "flex", alignItems: "center", gap: "1rem", width: "75%", margin: "0.4rem 0" },
   divLine: { flex: 1, height: 1, background: "var(--c-border)" },
   divText: { fontSize: "0.62rem", letterSpacing: "0.25em", color: "var(--c-faint)", fontFamily: "var(--font-data)" },
-  modeRow: { display: "flex", gap: "0.3rem", flexWrap: "wrap", justifyContent: "center", padding: "0.5rem 0", borderTop: "1px solid var(--c-border)", borderBottom: "1px solid var(--c-border)", width: "100%", marginTop: "0.2rem" },
+  modeRow: { display: "flex", gap: "0.3rem", flexWrap: "wrap", justifyContent: "center", width: "100%", marginTop: "0.2rem" },
   modeBtn: { background: "transparent", border: "1px solid var(--c-border)", color: "var(--c-faint)", fontFamily: "var(--font-data)", fontSize: "0.62rem", letterSpacing: "0.2em", padding: "0.5rem 1rem", cursor: "pointer", transition: "all 0.18s" },
   modeBtnOn: { border: "1px solid var(--c-border-strong)", color: "var(--c-fg)", background: "rgba(220,200,160,0.07)", textShadow: "0 0 12px rgba(220,200,160,0.3)" },
   back: { background: "transparent", border: "none", color: "var(--c-muted)", fontFamily: "var(--font-data)", fontSize: "0.68rem", letterSpacing: "0.15em", cursor: "pointer", transition: "color 0.2s", padding: "0.3rem" },
