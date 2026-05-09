@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import LifeCalendar from "./LifeCalendar";
 
 const MODES = [
   { key: "seconds", label: "SECONDS" },
@@ -377,11 +378,8 @@ export default function MementoMori() {
   }, phase === "reveal");
 
   const handleReveal = () => {
-    if (!isValidDate) {
-      setDateError(true);
-      return;
-    }
-    const ts = new Date(year, monthIdx, day).getTime();
+    if (!isValidDate) { setDateError(true); return; }
+    const ts  = new Date(year, monthIdx, day).getTime();
     const dts = getDeathTs(ts);
     setBirthTs(ts);
     setDeathTs(dts);
@@ -399,7 +397,27 @@ export default function MementoMori() {
     }, 400);
   };
 
+  const goCalendar = () => {
+    setExiting(true);
+    setTimeout(() => { setPhase("calendar"); setExiting(false); }, 400);
+  };
+
+  const fromCalendar = () => {
+    setExiting(true);
+    setTimeout(() => { setPhase("reveal"); setExiting(false); }, 400);
+  };
+
   const curMode = MODES.find(m => m.key === mode);
+
+  if (phase === "calendar") {
+    return (
+      <LifeCalendar
+        birthTs={birthTs}
+        deathTs={deathTs}
+        onBack={fromCalendar}
+      />
+    );
+  }
 
   return (
     <div style={s.root}>
@@ -493,7 +511,11 @@ export default function MementoMori() {
               <p style={s.blockNote}>or you could die tomorrow — you never know</p>
             </div>
 
-            <button onClick={reset} style={s.back} className="back-btn">← begin again</button>
+            {/* ── two action buttons ── */}
+            <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", justifyContent: "center", marginTop: "0.6rem" }}>
+              <button onClick={reset} style={s.back} className="back-btn">← begin again</button>
+              <button onClick={goCalendar} style={s.calBtn} className="cal-btn">see your calendar →</button>
+            </div>
 
             <p style={s.quote}>
               "The time which you give to another is taken from your life."
@@ -513,178 +535,45 @@ export default function MementoMori() {
 }
 
 const s = {
-  root: {
-    minHeight: "100vh",
-    background: "var(--c-bg)",
-    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-    position: "relative",
-    fontFamily: "var(--font-display)",
-    color: "var(--c-fg)",
-  },
-  vignette: {
-    position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none",
-    background: "radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(0,0,0,0.88) 100%)",
-  },
-  grain: {
-    position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none", opacity: 0.4,
-    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`,
-  },
-  inputScene: {
-    display: "flex", flexDirection: "column", alignItems: "center", gap: "1.2rem",
-    zIndex: 5, textAlign: "center", padding: "1rem 1.5rem",
-    maxWidth: 640, width: "100%",
-  },
-  revealScroll: {
-    width: "100%",
-    maxHeight: "100vh",
-    overflowY: "auto",
-    WebkitOverflowScrolling: "touch",
-    zIndex: 5,
-    display: "flex", justifyContent: "center",
-    scrollbarWidth: "none",
-  },
-  revealInner: {
-    display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem",
-    textAlign: "center", padding: "1.2rem 1.5rem 2rem",
-    maxWidth: 620, width: "100%",
-  },
+  root: { minHeight: "100vh", background: "var(--c-bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", fontFamily: "var(--font-display)", color: "var(--c-fg)" },
+  vignette: { position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none", background: "radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(0,0,0,0.88) 100%)" },
+  grain: { position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none", opacity: 0.4, backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")` },
+  inputScene: { display: "flex", flexDirection: "column", alignItems: "center", gap: "1.2rem", zIndex: 5, textAlign: "center", padding: "1rem 1.5rem", maxWidth: 640, width: "100%" },
+  revealScroll: { width: "100%", maxHeight: "100vh", overflowY: "auto", WebkitOverflowScrolling: "touch", zIndex: 5, display: "flex", justifyContent: "center", scrollbarWidth: "none" },
+  revealInner: { display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem", textAlign: "center", padding: "1.2rem 1.5rem 2rem", maxWidth: 620, width: "100%" },
   titleWrap: { display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" },
   titleRow:  { display: "flex", alignItems: "center", gap: "1.2rem", width: "100%" },
   titleLine: { flex: 1, height: 1, background: "linear-gradient(to right, transparent, var(--c-border-strong), transparent)" },
-  title: {
-    fontSize: "clamp(1.8rem, 6.5vw, 4rem)", fontWeight: "bold",
-    letterSpacing: "0.32em", color: "var(--c-fg)", margin: 0,
-    fontFamily: "var(--font-display)",
-    textShadow: "0 0 60px rgba(220,200,160,0.15), 0 2px 4px rgba(0,0,0,0.8)",
-    whiteSpace: "nowrap",
-  },
-  titleSub: {
-    fontSize: "0.7rem", letterSpacing: "0.35em", color: "var(--c-muted)", margin: 0,
-    fontFamily: "var(--font-data)",
-  },
-  question: {
-    fontSize: "0.85rem", letterSpacing: "0.1em", color: "var(--c-mid)", fontStyle: "italic",
-    fontFamily: "var(--font-display)",
-  },
-  wheelOuter: {
-    position: "relative", background: "rgba(255,255,255,0.025)",
-    border: "1px solid var(--c-border)",
-    padding: "0.8rem 1rem 0.6rem",
-    width: "100%", maxWidth: 380,
-  },
-  wheelLabels: {
-    display: "flex",
-    fontSize: "0.58rem", letterSpacing: "0.2em", color: "var(--c-faint)",
-    marginBottom: "0.4rem",
-    fontFamily: "var(--font-data)",
-  },
+  title: { fontSize: "clamp(1.8rem, 6.5vw, 4rem)", fontWeight: "bold", letterSpacing: "0.32em", color: "var(--c-fg)", margin: 0, fontFamily: "var(--font-display)", textShadow: "0 0 60px rgba(220,200,160,0.15), 0 2px 4px rgba(0,0,0,0.8)", whiteSpace: "nowrap" },
+  titleSub: { fontSize: "0.7rem", letterSpacing: "0.35em", color: "var(--c-muted)", margin: 0, fontFamily: "var(--font-data)" },
+  question: { fontSize: "0.85rem", letterSpacing: "0.1em", color: "var(--c-mid)", fontStyle: "italic", fontFamily: "var(--font-display)" },
+  wheelOuter: { position: "relative", background: "rgba(255,255,255,0.025)", border: "1px solid var(--c-border)", padding: "0.8rem 1rem 0.6rem", width: "100%", maxWidth: 380 },
+  wheelLabels: { display: "flex", fontSize: "0.58rem", letterSpacing: "0.2em", color: "var(--c-faint)", marginBottom: "0.4rem", fontFamily: "var(--font-data)" },
   wheelLabelMonth: { width: 96, textAlign: "center", flexShrink: 0 },
   wheelLabelDay:   { width: 76, textAlign: "center", flexShrink: 0, marginLeft: 9 },
   wheelLabelYear:  { width: 88, textAlign: "center", flexShrink: 0, marginLeft: 9 },
   wheelLabelLever: { width: 52, textAlign: "center", flexShrink: 0, marginLeft: 13 },
   wheelRow: { display: "flex", alignItems: "center" },
-  wheelSep: {
-    width: 1, height: ITEM_H * 3,
-    background: "linear-gradient(to bottom, transparent, var(--c-border), transparent)",
-    margin: "0 0.15rem",
-  },
-  dateDisplay: {
-    fontSize: "0.78rem", letterSpacing: "0.25em", color: "var(--c-muted)",
-    fontFamily: "var(--font-data)",
-  },
-  dateError: {
-    fontSize: "0.62rem", letterSpacing: "0.18em", color: "var(--c-error)",
-    marginTop: "0.5rem", textAlign: "center",
-    fontFamily: "var(--font-data)",
-    animation: "fadeIn 0.2s ease",
-  },
-  block: {
-    display: "flex", flexDirection: "column", alignItems: "center", gap: "0.2rem",
-    padding: "1rem 2rem",
-    background: "rgba(255,255,255,0.025)",
-    border: "1px solid var(--c-border)",
-    width: "100%",
-  },
-  blockRemaining: {
-    background: "rgba(0,0,0,0.3)",
-    border: "1px solid rgba(200,170,80,0.14)",
-  },
-  blockEyebrow: {
-    fontSize: "0.65rem", letterSpacing: "0.3em", color: "var(--c-mid)", margin: 0,
-    fontFamily: "var(--font-data)",
-  },
-  counterWrap: {
-    fontSize: "clamp(1.4rem, 5vw, 3rem)", fontWeight: "bold",
-    letterSpacing: "0.04em", color: "var(--c-fg)",
-    textShadow: "0 0 40px rgba(230,210,170,0.2)",
-    fontFamily: "var(--font-data)",
-  },
-  blockUnit: {
-    fontSize: "0.62rem", letterSpacing: "0.4em", color: "var(--c-faint)", margin: 0,
-    fontFamily: "var(--font-data)",
-  },
-  blockNote: {
-    fontSize: "0.7rem", fontStyle: "italic", letterSpacing: "0.05em",
-    color: "var(--c-mid)", marginTop: "0.3rem",
-    fontFamily: "var(--font-display)",
-  },
-  divider: {
-    display: "flex", alignItems: "center", gap: "1rem",
-    width: "75%", margin: "0.4rem 0",
-  },
+  wheelSep: { width: 1, height: ITEM_H * 3, background: "linear-gradient(to bottom, transparent, var(--c-border), transparent)", margin: "0 0.15rem" },
+  dateDisplay: { fontSize: "0.78rem", letterSpacing: "0.25em", color: "var(--c-muted)", fontFamily: "var(--font-data)" },
+  dateError: { fontSize: "0.62rem", letterSpacing: "0.18em", color: "var(--c-error)", marginTop: "0.5rem", textAlign: "center", fontFamily: "var(--font-data)", animation: "fadeIn 0.2s ease" },
+  block: { display: "flex", flexDirection: "column", alignItems: "center", gap: "0.2rem", padding: "1rem 2rem", background: "rgba(255,255,255,0.025)", border: "1px solid var(--c-border)", width: "100%" },
+  blockRemaining: { background: "rgba(0,0,0,0.3)", border: "1px solid rgba(200,170,80,0.14)" },
+  blockEyebrow: { fontSize: "0.65rem", letterSpacing: "0.3em", color: "var(--c-mid)", margin: 0, fontFamily: "var(--font-data)" },
+  counterWrap: { fontSize: "clamp(1.4rem, 5vw, 3rem)", fontWeight: "bold", letterSpacing: "0.04em", color: "var(--c-fg)", textShadow: "0 0 40px rgba(230,210,170,0.2)", fontFamily: "var(--font-data)" },
+  blockUnit: { fontSize: "0.62rem", letterSpacing: "0.4em", color: "var(--c-faint)", margin: 0, fontFamily: "var(--font-data)" },
+  blockNote: { fontSize: "0.7rem", fontStyle: "italic", letterSpacing: "0.05em", color: "var(--c-mid)", marginTop: "0.3rem", fontFamily: "var(--font-display)" },
+  divider: { display: "flex", alignItems: "center", gap: "1rem", width: "75%", margin: "0.4rem 0" },
   divLine: { flex: 1, height: 1, background: "var(--c-border)" },
   divText: { fontSize: "0.62rem", letterSpacing: "0.25em", color: "var(--c-faint)", fontFamily: "var(--font-data)" },
-  modeRow: {
-    display: "flex", gap: "0.3rem", flexWrap: "wrap", justifyContent: "center",
-    padding: "0.5rem 0",
-    borderTop: "1px solid var(--c-border)",
-    borderBottom: "1px solid var(--c-border)",
-    width: "100%",
-    marginTop: "0.2rem",
-  },
-  modeBtn: {
-    background: "transparent",
-    border: "1px solid var(--c-border)",
-    color: "var(--c-faint)",
-    fontFamily: "var(--font-data)",
-    fontSize: "0.62rem", letterSpacing: "0.2em",
-    padding: "0.5rem 1rem",
-    cursor: "pointer", transition: "all 0.18s",
-  },
-  modeBtnOn: {
-    border: "1px solid var(--c-border-strong)",
-    color: "var(--c-fg)",
-    background: "rgba(220,200,160,0.07)",
-    textShadow: "0 0 12px rgba(220,200,160,0.3)",
-  },
-  back: {
-    background: "transparent", border: "none",
-    color: "var(--c-muted)",
-    fontFamily: "var(--font-data)",
-    fontSize: "0.68rem", letterSpacing: "0.15em",
-    cursor: "pointer", transition: "color 0.2s", padding: "0.3rem",
-    marginTop: "0.4rem",
-  },
-  quote: {
-    fontSize: "0.72rem", fontStyle: "italic",
-    color: "var(--c-fg)", letterSpacing: "0.04em",
-    maxWidth: 360, lineHeight: 2,
-    fontFamily: "var(--font-display)",
-  },
-  footer: {
-    position: "relative",
-    fontSize: "0.60rem", letterSpacing: "0.30em",
-    color: "var(--c-mid)", zIndex: 6,
-    marginTop: "1rem",
-    paddingBottom: "1.5rem",
-    textAlign: "center",
-    lineHeight: 2,
-    fontFamily: "var(--font-data)",
-  },
-  footerBy: {
-    letterSpacing: "0.15em",
-    fontSize: "0.6rem",
-  },
+  modeRow: { display: "flex", gap: "0.3rem", flexWrap: "wrap", justifyContent: "center", padding: "0.5rem 0", borderTop: "1px solid var(--c-border)", borderBottom: "1px solid var(--c-border)", width: "100%", marginTop: "0.2rem" },
+  modeBtn: { background: "transparent", border: "1px solid var(--c-border)", color: "var(--c-faint)", fontFamily: "var(--font-data)", fontSize: "0.62rem", letterSpacing: "0.2em", padding: "0.5rem 1rem", cursor: "pointer", transition: "all 0.18s" },
+  modeBtnOn: { border: "1px solid var(--c-border-strong)", color: "var(--c-fg)", background: "rgba(220,200,160,0.07)", textShadow: "0 0 12px rgba(220,200,160,0.3)" },
+  back: { background: "transparent", border: "none", color: "var(--c-muted)", fontFamily: "var(--font-data)", fontSize: "0.68rem", letterSpacing: "0.15em", cursor: "pointer", transition: "color 0.2s", padding: "0.3rem" },
+  calBtn: { background: "transparent", border: "1px solid var(--c-border)", color: "var(--c-mid)", fontFamily: "var(--font-data)", fontSize: "0.68rem", letterSpacing: "0.15em", cursor: "pointer", transition: "all 0.2s", padding: "0.3rem 0.8rem" },
+  quote: { fontSize: "0.72rem", fontStyle: "italic", color: "var(--c-fg)", letterSpacing: "0.04em", maxWidth: 360, lineHeight: 2, fontFamily: "var(--font-display)" },
+  footer: { position: "relative", fontSize: "0.60rem", letterSpacing: "0.30em", color: "var(--c-mid)", zIndex: 6, marginTop: "1rem", paddingBottom: "1.5rem", textAlign: "center", lineHeight: 2, fontFamily: "var(--font-data)" },
+  footerBy: { letterSpacing: "0.15em", fontSize: "0.6rem" },
 };
 
 const css = `
@@ -727,15 +616,10 @@ const css = `
   .mm-reveal-scroll::-webkit-scrollbar { display: none; }
 
   .face-btn { transition: color 0.2s; }
-  .face-btn:hover {
-    color: var(--c-fg) !important;
-    text-shadow: 0 0 20px rgba(220,200,160,0.3);
-  }
-  .mode-btn:hover {
-    border-color: var(--c-border-strong) !important;
-    color: var(--c-mid) !important;
-  }
+  .face-btn:hover { color: var(--c-fg) !important; text-shadow: 0 0 20px rgba(220,200,160,0.3); }
+  .mode-btn:hover { border-color: var(--c-border-strong) !important; color: var(--c-mid) !important; }
   .back-btn:hover { color: var(--c-mid) !important; }
+  .cal-btn:hover  { border-color: var(--c-border-strong) !important; color: var(--c-fg) !important; background: rgba(220,200,160,0.06) !important; }
 
   ::selection { background: rgba(220,200,160,0.18); color: var(--c-fg); }
   ::-webkit-scrollbar { width: 3px; }
@@ -743,8 +627,6 @@ const css = `
   ::-webkit-scrollbar-thumb { background: var(--c-border); }
 
   @media (max-width: 420px) {
-    .wheel-outer-wrap {
-      padding: 0.6rem 0.5rem 0.5rem;
-    }
+    .wheel-outer-wrap { padding: 0.6rem 0.5rem 0.5rem; }
   }
 `;
