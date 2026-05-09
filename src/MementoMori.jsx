@@ -481,19 +481,6 @@ export default function MementoMori() {
               <p style={s.blockUnit}>{curMode.label}</p>
             </div>
 
-            <div style={s.modeRow}>
-              {MODES.map(m => (
-                <button
-                  key={m.key}
-                  onClick={() => setMode(m.key)}
-                  className="mode-btn"
-                  style={{ ...s.modeBtn, ...(mode === m.key ? s.modeBtnOn : {}) }}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-
             <div style={s.divider}>
               <div style={s.divLine} />
               <span style={s.divText}>& YET</span>
@@ -509,6 +496,19 @@ export default function MementoMori() {
               </div>
               <p style={{ ...s.blockUnit, color: "var(--c-gold-faint)" }}>{curMode.label} REMAINING</p>
               <p style={s.blockNote}>or you could die tomorrow — you never know</p>
+            </div>
+
+            <div style={s.modeRow}>
+              {MODES.map(m => (
+                <button
+                  key={m.key}
+                  onClick={() => setMode(m.key)}
+                  className="mode-btn"
+                  style={{ ...s.modeBtn, ...(mode === m.key ? s.modeBtnOn : {}) }}
+                >
+                  {m.label}
+                </button>
+              ))}
             </div>
 
             {/* ── two action buttons ── */}
