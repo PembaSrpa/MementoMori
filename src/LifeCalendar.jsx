@@ -3,8 +3,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 
 const LIFE_EXPECTANCY_YEARS = 77;
-const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const DAY_LABELS  = ["S","M","T","W","T","F","S"];
+const WEEKS_PER_YEAR = 52;
 
 const QUOTES = [
   "You are not promised tomorrow.", "The clock does not pause for the living.",
@@ -14,7 +13,7 @@ const QUOTES = [
   "The hours you waste are the hours you lose.", "No one escapes the final accounting.",
   "You will not remember most of today.", "The years ahead are fewer than the years behind.",
   "Live as if the clock were visible.", "Nothing lasts. Not even you.",
-  "The calendar does not lie.", "Each X was a day you cannot reclaim.",
+  "The calendar does not lie.", "Each square was a week you cannot reclaim.",
   "Urgency is the only rational response.", "The unexamined life ends the same way.",
   "You are a brief arrangement of matter.", "Most of your life has already happened.",
   "The moment you read this is already gone.", "Death is not waiting - it is arriving.",
@@ -83,7 +82,7 @@ const QUOTES = [
   "The world is not waiting for you to be ready.", "You are already enough to begin.",
   "Tomorrow is a promise no one can keep.", "The meaning is in the doing, not the waiting.",
   "You cannot outrun your mortality. You can outrun your fear.", "The cost of waiting is always higher than it seems.",
-  "Every unlived day is a small death of its own.", "Time does not care about your plans.",
+  "Every unlived week is a small death of its own.", "Time does not care about your plans.",
   "You are always one breath closer to the last.", "The ordinary days are the extraordinary ones.",
   "Nothing important happens without a deadline.", "Your one life is not practice.",
   "The risk of living fully is far less than the risk of not.", "You will become the sum of your chosen hours.",
@@ -107,23 +106,23 @@ const QUOTES = [
   "Live with the kind of urgency that comes from love.", "The only failure is the one you did not attempt.",
   "Your death is not the problem. How you live is.", "Nothing is more motivating than a deadline.",
   "The brevity of life is not a tragedy. The waste of it is.", "You are a brief light in a long darkness.",
-  "Make your days memorable before they become Xs.", "The present moment always will have been.",
+  "Make your weeks memorable before they become filled squares.", "The present moment always will have been.",
   "You get one shot at today.", "Every ending was once a beginning.",
-  "Your finite days are what make them precious.", "The world is richer for your being here - for now.",
+  "Your finite weeks are what make them precious.", "The world is richer for your being here - for now.",
   "Do not let the weight of tomorrow crush today.", "Even the longest life is a short story.",
   "You are already in the middle of your story.", "The past is fixed. The future is not. Now is.",
-  "Each day is a door that closes behind you.", "You only regret the love you did not give.",
+  "Each week is a door that closes behind you.", "You only regret the love you did not give.",
   "The universe does not keep score. You do.", "Your time is the only thing you can truly give.",
   "There are no ordinary moments.", "You are burning. Make it bright.",
-  "Live so that the Xs were worth marking.", "The finale comes for everyone.",
+  "Live so that the filled squares were worth marking.", "The finale comes for everyone.",
   "You are not guaranteed a graceful exit.", "What matters will become clear at the end.",
   "The shortness of life is not an excuse - it is a reason.", "You already know what to do.",
-  "Make the Xs count.", "The silence after is very long.",
+  "Make the weeks count.", "The silence after is very long.",
   "Your unfinished business will stay unfinished.", "You are the only one who can waste your time.",
   "This moment, once gone, is gone entirely.", "Live as though death is real - because it is.",
   "You are a brief visitor in an ancient world.", "Time is the one thing you cannot make more of.",
   "The discipline of today is the freedom of tomorrow.", "Your days are a gift you did not earn.",
-  "The march is constant and indifferent.", "You have enough days if you use them.",
+  "The march is constant and indifferent.", "You have enough weeks if you use them.",
   "Act now. The later you imagine may not come.", "The unlived life ends the same as the lived one.",
   "You are already on the other side of many lasts.", "What is enough? You may never know unless you ask.",
   "The ticking you hear is not a metaphor.", "You are running out of new first times.",
@@ -132,18 +131,18 @@ const QUOTES = [
   "You are mortal. So is everyone you love.", "The world will be fine without you. Be fine with that.",
   "There is no version of this that does not end.", "Your life is happening right now.",
   "The exit is already decided. The path is not.", "Leave nothing important unsaid.",
-  "You are the author of the days that remain.", "Time does not wait for grief to pass.",
-  "The only day you can change is today.", "Your remaining Xs are not yet written.",
+  "You are the author of the weeks that remain.", "Time does not wait for grief to pass.",
+  "The only week you can change is this one.", "Your remaining squares are not yet filled.",
   "Death is certain. Meaning is optional. Choose.", "You are always in the middle of your only life.",
-  "The last day will feel like any other. Until it does not.", "Begin.",
+  "The last week will feel like any other. Until it does not.", "Begin.",
   "Every moment is the last of its kind.", "You cannot be remembered for what you did not do.",
   "The present is your only address.", "What you love, love now.",
-  "The calendar is filling up whether you live or not.", "Do not die with a perfect plan and no action.",
+  "The grid is filling whether you live or not.", "Do not die with a perfect plan and no action.",
   "Your life is not a waiting room.", "The hardest part is believing your time is valuable.",
   "Time reveals what matters. So does death.", "You are here. Briefly. Make it count.",
   "The finite life is the only kind there is.", "Start with today. Today is enough.",
   "Nothing is promised past this breath.", "The weight of what you did not do is the heaviest.",
-  "Live so that every X was a day fully claimed.", "The light you carry is borrowed. Burn bright.",
+  "Live so that every filled square was a week fully claimed.", "The light you carry is borrowed. Burn bright.",
   "You are already someone's memory of the past.", "Remember. You must die.",
 ];
 
@@ -195,194 +194,38 @@ function BgCanvas() {
   return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }} />;
 }
 
-function MonthGrid({ year, monthIdx, birthTs, today }) {
-  const firstDay    = new Date(year, monthIdx, 1).getDay();
-  const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
-
-  const cells = [];
-  for (let i = 0; i < firstDay; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-  while (cells.length % 7 !== 0) cells.push(null);
-
-  return (
-    <div>
-      <p style={{
-        fontSize: "clamp(0.8rem, 1.4vw, 1rem)",
-        letterSpacing: "0.06em",
-        color: "#f0e8d8",
-        marginBottom: "0.5rem",
-        fontWeight: "bold",
-        fontFamily: "Courier New, monospace",
-      }}>
-        {MONTH_NAMES[monthIdx]}
-      </p>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", marginBottom: "0.3rem" }}>
-        {DAY_LABELS.map((d, i) => (
-          <div key={i} style={{
-            textAlign: "center",
-            fontSize: "clamp(0.6rem, 1vw, 0.72rem)",
-            color: i === 0 || i === 6 ? "#e07060" : "#d8cfc4",
-            letterSpacing: "0.03em",
-            paddingBottom: "0.25rem",
-            fontFamily: "Courier New, monospace",
-            fontWeight: "600",
-          }}>{d}</div>
-        ))}
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", rowGap: "2px" }}>
-        {cells.map((d, i) => {
-          if (!d) return <div key={i} />;
-          const thisDate  = new Date(year, monthIdx, d);
-          const isToday   = today.getFullYear() === year && today.getMonth() === monthIdx && today.getDate() === d;
-          const isPast    = thisDate < today && !isToday;
-          const isBefore  = birthTs !== null && thisDate < new Date(birthTs);
-          const colIdx    = i % 7;
-          const isWeekend = colIdx === 0 || colIdx === 6;
-
-          let color = "#d8cfc4";
-          if (isToday)        color = "#ff6030";
-          else if (isBefore)  color = "rgba(120,100,80,0.4)";
-          else if (isPast)    color = "rgba(160,110,90,0.7)";
-          else if (isWeekend) color = "#d06650";
-
-          return (
-            <div key={i} style={{
-              position: "relative",
-              textAlign: "center",
-              fontSize: "clamp(0.6rem, 1vw, 0.72rem)",
-              lineHeight: "1.9em",
-              color,
-              borderRadius: isToday ? "50%" : 0,
-              background: isToday ? "rgba(180,40,10,0.28)" : "transparent",
-              boxShadow: isToday
-                ? "0 0 12px 4px rgba(200,60,20,0.55), inset 0 -2px 6px rgba(200,60,20,0.35)"
-                : "none",
-              userSelect: "none",
-            }}>
-              {isPast && !isBefore && (
-                <svg viewBox="0 0 10 10" style={{
-                  position: "absolute", inset: 0,
-                  width: "100%", height: "100%",
-                  pointerEvents: "none", opacity: 0.75,
-                }}>
-                  <line x1="2" y1="2" x2="8" y2="8" stroke="#c04030" strokeWidth="1.6" strokeLinecap="round" />
-                  <line x1="8" y1="2" x2="2" y2="8" stroke="#c04030" strokeWidth="1.6" strokeLinecap="round" />
-                </svg>
-              )}
-              {isToday && (
-                <div style={{
-                  position: "absolute", bottom: 0, left: 0, right: 0,
-                  height: "44%", borderRadius: "0 0 50% 50%",
-                  background: "linear-gradient(to top, rgba(220,60,10,0.7), transparent)",
-                  pointerEvents: "none",
-                  animation: "mm-burn 1.8s ease-in-out infinite alternate",
-                }} />
-              )}
-              <span style={{ position: "relative", zIndex: 1 }}>{d}</span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export default function LifeCalendar({ birthTs, deathTs, onBack }) {
-  const birthDate = new Date(birthTs);
-  const birthYear = birthDate.getFullYear();
-  const deathYear = birthYear + LIFE_EXPECTANCY_YEARS;
-  const today     = new Date();
+  const birthDate  = new Date(birthTs);
+  const birthYear  = birthDate.getFullYear();
+  const today      = new Date();
+  const msPerWeek  = 7 * 24 * 3600 * 1000;
+  const weeksLived = Math.floor((today - birthDate) / msPerWeek);
+  const totalWeeks = LIFE_EXPECTANCY_YEARS * WEEKS_PER_YEAR;
+  const weeksLeft  = Math.max(0, totalWeeks - weeksLived);
+  const pct        = ((Math.min(weeksLived, totalWeeks) / totalWeeks) * 100).toFixed(1);
 
-  const [viewYear, setViewYear] = useState(today.getFullYear());
   const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], []);
 
-  const totalDays   = Math.round((deathTs - birthTs) / 86400000);
-  const elapsedDays = Math.max(0, Math.round((Date.now() - birthTs) / 86400000));
-  const remainDays  = Math.max(0, totalDays - elapsedDays);
-  const pct         = ((elapsedDays / totalDays) * 100).toFixed(1);
-
-  const months = Array.from({ length: 12 }, (_, i) => i);
+  const SQ = 11;
+  const GAP = 2;
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#0c0c0c",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      position: "relative",
-      fontFamily: "Courier New, monospace",
-      color: "#f0e8d8",
-    }}>
+    <div style={{ minHeight: "100vh", background: "#0c0c0c", display: "flex", flexDirection: "column", alignItems: "center", position: "relative", fontFamily: "Courier New, monospace", color: "#f0e8d8" }}>
       <style>{`
-        @keyframes mm-burn {
-          from { opacity: 0.5; transform: scaleX(0.85); }
-          to   { opacity: 1;   transform: scaleX(1); }
+        @keyframes mm-pulse {
+          0%, 100% { box-shadow: 0 0 4px 2px rgba(220,80,30,0.9); }
+          50%       { box-shadow: 0 0 10px 4px rgba(220,80,30,0.5); }
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { background: #0c0c0c; min-height: 100vh; }
-
-        .lc-nav-btn {
-          background: transparent;
-          border: 1px solid rgba(220,200,160,0.35);
-          color: #e8dcc8;
-          font-family: Courier New, monospace;
-          font-size: clamp(0.7rem, 1.2vw, 0.85rem);
-          letter-spacing: 0.12em;
-          padding: 0.5rem 1.0rem;
-          cursor: pointer;
-          transition: all 0.18s;
-          font-weight: 600;
-        }
-        .lc-nav-btn:hover {
-          border-color: rgba(220,200,160,0.8);
-          color: #ffffff;
-          background: rgba(220,200,160,0.08);
-        }
-        .lc-nav-btn:disabled {
-          opacity: 0.25;
-          cursor: not-allowed;
-        }
-        .lc-back {
-          background: transparent;
-          border: none;
-          color: #c4b490;
-          font-family: Courier New, monospace;
-          font-size: 0.78rem;
-          letter-spacing: 0.15em;
-          cursor: pointer;
-          transition: color 0.2s;
-          padding: 0.4rem;
-        }
+        .lc-back { background: transparent; border: none; color: #c4b490; font-family: Courier New, monospace; font-size: 0.78rem; letter-spacing: 0.15em; cursor: pointer; transition: color 0.2s; padding: 0.2rem; }
         .lc-back:hover { color: #f0e8d8; }
         .lc-face { color: #c4b490; transition: color 0.2s; }
-        .lc-face:hover { color: #f0e8d8; text-shadow: 0 0 20px rgba(220,200,160,0.4); }
-
+        .lc-face:hover { color: #f0e8d8; }
         ::selection { background: rgba(220,200,160,0.2); color: #f0e8d8; }
-        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #0c0c0c; }
         ::-webkit-scrollbar-thumb { background: rgba(220,200,160,0.2); }
-
-        .lc-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: clamp(1.2rem, 2.5vw, 2.5rem) clamp(1.4rem, 3vw, 3rem);
-          width: 100%;
-        }
-        @media (max-width: 700px) {
-          .lc-grid {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.2rem 0.8rem;
-          }
-        }
-        @media (max-width: 420px) {
-          .lc-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem 0.6rem;
-          }
-        }
       `}</style>
 
       <BgCanvas />
@@ -390,81 +233,84 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
       <div style={{ position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none", opacity: 0.3, backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")` }} />
       <Corner pos="tl" /><Corner pos="tr" /><Corner pos="bl" /><Corner pos="br" />
 
-      <div style={{
-        position: "relative", zIndex: 5, width: "100%",
-        maxWidth: 1200, padding: "3rem 2rem 4rem",
-        display: "flex", flexDirection: "column",
-        alignItems: "center", gap: "2rem",
-      }}>
+      <div style={{ position: "relative", zIndex: 5, width: "100%", maxWidth: 900, padding: "3rem 2rem 4rem", display: "flex", flexDirection: "column", alignItems: "center", gap: "2rem" }}>
 
         {/* title */}
         <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", width: "100%" }}>
           <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(220,200,160,0.45), transparent)" }} />
-          <h1 style={{
-            fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
-            fontWeight: "bold", letterSpacing: "0.3em",
-            color: "#f0e8d8", margin: 0, whiteSpace: "nowrap",
-            textShadow: "0 0 60px rgba(220,200,160,0.2)",
-          }}>YOUR LIFE</h1>
+          <h1 style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: "bold", letterSpacing: "0.3em", color: "#f0e8d8", margin: 0, whiteSpace: "nowrap", textShadow: "0 0 60px rgba(220,200,160,0.2)" }}>
+            MEMENTO MORI
+          </h1>
           <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(220,200,160,0.45), transparent)" }} />
         </div>
 
-        {/* year nav */}
-        <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
-          <button
-            className="lc-nav-btn"
-            onClick={() => viewYear > birthYear && setViewYear(v => v - 1)}
-            disabled={viewYear <= birthYear}
-          >← PREV</button>
-
-          <div style={{ textAlign: "center", minWidth: 130 }}>
-            <p style={{
-              fontSize: "clamp(2.2rem, 5vw, 3.2rem)",
-              fontWeight: "bold", letterSpacing: "0.2em",
-              color: "#f0e8d8", margin: 0,
-              textShadow: "0 0 30px rgba(220,200,160,0.25)",
-            }}>{viewYear}</p>
-            <p style={{ fontSize: "0.65rem", letterSpacing: "0.2em", color: "#c4b490", marginTop: "0.2rem" }}>
-              AGE {viewYear - birthYear}
-            </p>
-          </div>
-
-          <button
-            className="lc-nav-btn"
-            onClick={() => viewYear < deathYear && setViewYear(v => v + 1)}
-            disabled={viewYear >= deathYear}
-          >NEXT →</button>
+        
+        {/* quote */}
+        <div style={{ maxWidth: 520, textAlign: "center", width: "100%" }}>
+          <p style={{ fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)", fontStyle: "italic", color: "#c4b490", letterSpacing: "0.05em", lineHeight: 2 }}>
+            "{quote}"
+          </p>
         </div>
 
-        {/* calendar grid */}
-        <div className="lc-grid">
-          {months.map(m => (
-            <MonthGrid key={m} year={viewYear} monthIdx={m} birthTs={birthTs} today={today} />
-          ))}
+        {/* grid */}
+        <div style={{ overflowX: "auto", width: "100%", paddingBottom: "0.5rem" }}>
+          <div style={{ display: "flex", gap: GAP, alignItems: "flex-start", width: "fit-content", margin: "0 auto" }}>
+
+            {/* year labels */}
+            <div style={{ display: "flex", flexDirection: "column", gap: GAP, paddingTop: 1, flexShrink: 0 }}>
+              {Array.from({ length: LIFE_EXPECTANCY_YEARS }, (_, y) => (
+                <div key={y} style={{
+                  height: SQ,
+                  fontSize: "8px",
+                  color: y % 5 === 0 ? "rgba(220, 200, 160, 0.98)" : "transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  paddingRight: 5,
+                  minWidth: 32,
+                  fontFamily: "Courier New, monospace",
+                  userSelect: "none",
+                }}>{birthYear + y}</div>
+              ))}
+            </div>
+
+            {/* squares */}
+            <div style={{ display: "flex", flexDirection: "column", gap: GAP, flexShrink: 0 }}>
+              {Array.from({ length: LIFE_EXPECTANCY_YEARS }, (_, y) => (
+                <div key={y} style={{ display: "flex", gap: GAP }}>
+                  {Array.from({ length: WEEKS_PER_YEAR }, (_, w) => {
+                    const idx = y * WEEKS_PER_YEAR + w;
+                    const isPast    = idx < weeksLived;
+                    const isCurrent = idx === weeksLived;
+                    const isFuture  = idx > weeksLived;
+                    return (
+                      <div
+                        key={w}
+                        title={isCurrent ? `You are here — week ${weeksLived + 1} of your life` : undefined}
+                        style={{
+                          width: SQ, height: SQ, borderRadius: 1, flexShrink: 0,
+                          background: isPast ? "#9a2a18" : "transparent",
+                          border: isCurrent
+                            ? "2px solid rgb(245, 51, 7)"
+                            : isFuture
+                              ? "1px solid rgba(220, 200, 160, 0.49)"
+                              : "none",
+                          animation: isCurrent ? "mm-pulse 1.6s ease-in-out infinite" : "none",
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* back */}
         <button className="lc-back" onClick={onBack}>← back</button>
 
-        {/* quote */}
-        <div style={{
-          maxWidth: 520, textAlign: "center",
-          width: "100%",
-        }}>
-          <p style={{
-            fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
-            fontStyle: "italic",
-            color: "#c4b490",
-            letterSpacing: "0.05em",
-            lineHeight: 2,
-          }}>"{quote}"</p>
-        </div>
-
         {/* footer */}
-        <div style={{
-          fontSize: "0.60rem", letterSpacing: "0.24em",
-          color: "#c4b490", textAlign: "center", lineHeight: 2,
-        }}>
+        <div style={{ fontSize: "0.65rem", letterSpacing: "0.28em", color: "#c4b490", textAlign: "center", lineHeight: 2 }}>
           * MEMENTO MORI * TEMPUS FUGIT * CARPE DIEM *<br />
           <span style={{ letterSpacing: "0.15em", fontSize: "0.62rem" }}>
             made by{" "}
