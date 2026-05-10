@@ -443,7 +443,7 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
                               title={isCurrent ? "Click for this week" : undefined}
                               onClick={() => handleSquareClick(idx)}
                               style={{
-                                width: SQ*1.5, height: SQ*1.5,
+                                width: SQ, height: SQ,
                                 borderRadius: 1,
                                 flexShrink: 0,
                                 background: isPast ? "#9a2a18" : "transparent",
