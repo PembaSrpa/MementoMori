@@ -314,7 +314,7 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
   const [activeWeek, setActiveWeek] = useState(null);
   const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], []);
 
-  const SQ  = 11;
+  const SQ  = 14;
   const GAP = 2;
 
   const handleSquareClick = useCallback((idx) => {
@@ -349,7 +349,7 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
         @media (max-width: 500px) {
           .lc-row-desktop { display: none !important; }
           .lc-row-mobile  { display: flex !important; }
-          .lc-grid-sq { width: 6px !important; height: 6px !important; }
+          .lc-grid-sq { width: 10px !important; height: 10px !important; }
           .lc-year-label { font-size: 7px !important; min-width: 24px !important; }
         }
         @media (min-width: 501px) {
@@ -382,7 +382,7 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
       </div>
 
       {/* ── grid ── */}
-      <div style={{ position: "relative", zIndex: 5, width: "100%", flex: 1, padding: "1.5rem 1rem 0", paddingTop: "140px" }}>
+      <div style={{ position: "relative", zIndex: 5, width: "100%", flex: 1, padding: "1.5rem 1rem 0", paddingTop: "120px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", gap: "1.8rem", paddingBottom: "3rem" }}>
 
           <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
@@ -443,7 +443,7 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
                               title={isCurrent ? "Click for this week" : undefined}
                               onClick={() => handleSquareClick(idx)}
                               style={{
-                                width: SQ, height: SQ,
+                                width: SQ*1.5, height: SQ*1.5,
                                 borderRadius: 1,
                                 flexShrink: 0,
                                 background: isPast ? "#9a2a18" : "transparent",
