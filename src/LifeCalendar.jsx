@@ -1,9 +1,13 @@
 "use client";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 
 const LIFE_EXPECTANCY_YEARS = 77;
 const WEEKS_PER_YEAR = 52;
+const HALF = 26;
+
+const DE_DAYS = ["SONN", "MON", "DIENS", "MITT", "DONN", "FREI", "SAMS"];
 
 const QUOTES = [
   "You are not promised tomorrow.", "The clock does not pause for the living.",
@@ -194,38 +198,164 @@ function BgCanvas() {
   return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }} />;
 }
 
+function WeekPopup({ weekIndex, birthTs, onClose }) {
+  const [dayPct, setDayPct] = useState(0);
+  const birthDate = new Date(birthTs);
+  const weekStart = new Date(birthTs + weekIndex * 7 * 24 * 3600 * 1000);
+  const weekEnd   = new Date(birthTs + (weekIndex + 1) * 7 * 24 * 3600 * 1000 - 86400000);
+  const today     = new Date();
+
+  const fmt = (d) => d.toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" });
+
+  const getDayPct = () => {
+    const n = new Date();
+    return (n.getHours() * 3600 + n.getMinutes() * 60 + n.getSeconds()) / 86400 * 100;
+  };
+
+  useEffect(() => {
+    setDayPct(getDayPct());
+    const t = setInterval(() => setDayPct(getDayPct()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + i);
+    const isToday = d.toDateString() === today.toDateString();
+    const isPast  = d < today && !isToday;
+    return { d, isToday, isPast, dow: d.getDay() };
+  });
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 100,
+        background: "rgba(0,0,0,0.65)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "1rem",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#161410",
+          border: "1px solid rgba(220,200,160,0.25)",
+          width: "100%", maxWidth: 360,
+          fontFamily: "Courier New, monospace",
+          animation: "popup-in 0.22s cubic-bezier(0.16,1,0.3,1) both",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px 12px", borderBottom: "1px solid rgba(220,200,160,0.1)" }}>
+          <div>
+            <p style={{ fontSize: "9px", letterSpacing: "0.28em", color: "rgb(220, 200, 160)", margin: "0 0 3px" }}>
+              WEEK {weekIndex + 1} OF YOUR LIFE
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            style={{ background: "transparent", border: "1px solid rgba(220,200,160,0.2)", color: "rgba(220, 200, 160, 0.9)", width: 16, height: 16, cursor: "pointer", fontFamily: "Courier New,monospace", fontSize: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+          >✕</button>
+        </div>
+
+        <div style={{ padding: "12px 18px 16px" }}>
+          {days.map(({ d, isToday, isPast, dow }, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: i < 6 ? "1px solid rgba(220, 200, 160, 0.1)" : "none" }}>
+              <span style={{ fontSize: "9px", letterSpacing: "0.12em", color: isToday ? "#c4b490" : "rgba(220, 200, 160, 0.87)", width: 36, flexShrink: 0 }}>
+                {DE_DAYS[dow]}
+              </span>
+              <span style={{ fontSize: "10px", color: "rgba(220, 200, 160, 0.93)", width: 18, textAlign: "right", flexShrink: 0 }}>
+                {d.getDate()}
+              </span>
+
+              {isPast && (
+                <div style={{ flex: 1, height: 9, position: "relative", overflow: "hidden" }}>
+                  <svg width="100%" height="9" viewBox="0 0 100 9" preserveAspectRatio="none" style={{ position: "absolute", inset: 0 }}>
+                    <line x1="0" y1="0" x2="100" y2="9" stroke="#7a2010" strokeWidth="1.4" />
+                    <line x1="0" y1="9" x2="100" y2="0" stroke="#7a2010" strokeWidth="1.4" />
+                  </svg>
+                </div>
+              )}
+
+              {isToday && (
+                <>
+                  <div style={{ flex: 1, height: 9, background: "rgba(220,200,160,0.06)", border: "1px solid rgba(220,200,160,0.1)", position: "relative", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${dayPct}%`, background: "#9a2a18", transition: "width 0.8s linear" }} />
+                  </div>
+                </>
+              )}
+
+              {!isPast && !isToday && (
+                <div style={{ flex: 1, height: 9, border: "1px solid rgba(220,200,160,0.1)" }} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div style={{ padding: "0 18px 12px", fontSize: "8px", letterSpacing: "0.2em", color: "rgba(220, 200, 160, 0.81)", textAlign: "center" }}>
+          {new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LifeCalendar({ birthTs, deathTs, onBack }) {
   const birthDate  = new Date(birthTs);
   const birthYear  = birthDate.getFullYear();
   const today      = new Date();
-  const msPerWeek  = 7 * 24 * 3600 * 1000;
-  const weeksLived = Math.floor((today - birthDate) / msPerWeek);
+  const weeksLived = Math.floor((today - birthDate) / (7 * 24 * 3600 * 1000));
   const totalWeeks = LIFE_EXPECTANCY_YEARS * WEEKS_PER_YEAR;
   const weeksLeft  = Math.max(0, totalWeeks - weeksLived);
   const pct        = ((Math.min(weeksLived, totalWeeks) / totalWeeks) * 100).toFixed(1);
 
+  const [activeWeek, setActiveWeek] = useState(null);
   const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], []);
 
-  const SQ = 11;
+  const SQ  = 11;
   const GAP = 2;
 
+  const handleSquareClick = useCallback((idx) => {
+    if (idx === weeksLived) setActiveWeek(idx);
+  }, [weeksLived]);
+
   return (
-    <div style={{ minHeight: "100vh", background: "#0c0c0c", display: "flex", flexDirection: "column", alignItems: "center", position: "relative", fontFamily: "Courier New, monospace", color: "#f0e8d8" }}>
+    <div style={{ minHeight: "100vh", background: "#0c0c0c", display: "flex", flexDirection: "column", position: "relative", fontFamily: "Courier New, monospace", color: "#f0e8d8" }}>
       <style>{`
         @keyframes mm-pulse {
           0%, 100% { box-shadow: 0 0 4px 2px rgba(220,80,30,0.9); }
           50%       { box-shadow: 0 0 10px 4px rgba(220,80,30,0.5); }
         }
+        @keyframes popup-in {
+          from { opacity: 0; transform: scale(0.94) translateY(8px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; font-size: 16px; }
         html, body { background: #0c0c0c; min-height: 100vh; }
         .lc-back { background: transparent; border: none; color: #c4b490; font-family: Courier New, monospace; font-size: 0.78rem; letter-spacing: 0.15em; cursor: pointer; transition: color 0.2s; padding: 0.2rem; }
         .lc-back:hover { color: #f0e8d8; }
         .lc-face { color: #c4b490; transition: color 0.2s; }
         .lc-face:hover { color: #f0e8d8; }
+        .lc-sq-current { cursor: pointer; }
+        .lc-sq-current:hover { box-shadow: 0 0 14px 5px rgba(220,80,30,1) !important; }
         ::selection { background: rgba(220,200,160,0.2); color: #f0e8d8; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar { width: 3px; height: 3px; }
         ::-webkit-scrollbar-track { background: #0c0c0c; }
         ::-webkit-scrollbar-thumb { background: rgba(220,200,160,0.2); }
+
+        @media (max-width: 500px) {
+          .lc-row-desktop { display: none !important; }
+          .lc-row-mobile  { display: flex !important; }
+          .lc-grid-sq { width: 6px !important; height: 6px !important; }
+          .lc-year-label { font-size: 7px !important; min-width: 24px !important; }
+        }
+        @media (min-width: 501px) {
+          .lc-row-desktop { display: flex !important; }
+          .lc-row-mobile  { display: none !important; }
+        }
       `}</style>
 
       <BgCanvas />
@@ -233,94 +363,127 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
       <div style={{ position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none", opacity: 0.3, backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")` }} />
       <Corner pos="tl" /><Corner pos="tr" /><Corner pos="bl" /><Corner pos="br" />
 
-      <div style={{ position: "relative", zIndex: 5, width: "100%", maxWidth: 900, padding: "3rem 2rem 4rem", display: "flex", flexDirection: "column", alignItems: "center", gap: "2rem" }}>
+      {/* ── fixed header ── */}
+      <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 10, width: "100%", background: "rgba(12,12,12,0.95)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", padding: "1.2rem 1.5rem 0.9rem" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.9rem" }}>
 
-        {/* title */}
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", width: "100%" }}>
-          <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(220,200,160,0.45), transparent)" }} />
-          <h1 style={{ fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: "bold", letterSpacing: "0.3em", color: "#f0e8d8", margin: 0, whiteSpace: "nowrap", textShadow: "0 0 60px rgba(220,200,160,0.2)" }}>
-            MEMENTO MORI
-          </h1>
-          <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(220,200,160,0.45), transparent)" }} />
-        </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", width: "100%" }}>
+            <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(220,200,160,0.4), transparent)" }} />
+            <h1 style={{ fontSize: "clamp(1.2rem, 3vw, 2rem)", fontWeight: "bold", letterSpacing: "0.3em", color: "#f0e8d8", margin: 0, whiteSpace: "nowrap" }}>
+              MEMENTO MORI
+            </h1>
+            <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, rgba(220,200,160,0.4), transparent)" }} />
+          </div>
 
-        
-        {/* quote */}
-        <div style={{ maxWidth: 520, textAlign: "center", width: "100%" }}>
-          <p style={{ fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)", fontStyle: "italic", color: "#c4b490", letterSpacing: "0.05em", lineHeight: 2 }}>
+          <p style={{ fontSize: "clamp(0.7rem, 1.3vw, 0.85rem)", fontStyle: "italic", color: "#c4b490", letterSpacing: "0.05em", lineHeight: 1.8, textAlign: "center", maxWidth: 520 }}>
             "{quote}"
           </p>
         </div>
+      </div>
 
-        {/* grid */}
-        <div style={{ overflowX: "auto", width: "100%", paddingBottom: "0.5rem" }}>
-          <div style={{ display: "flex", gap: GAP, alignItems: "flex-start", width: "fit-content", margin: "0 auto" }}>
+      {/* ── grid ── */}
+      <div style={{ position: "relative", zIndex: 5, width: "100%", flex: 1, padding: "1.5rem 1rem 0", paddingTop: "140px" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", gap: "1.8rem", paddingBottom: "3rem" }}>
 
-            {/* year labels */}
-            <div style={{ display: "flex", flexDirection: "column", gap: GAP, paddingTop: 1, flexShrink: 0 }}>
-              {Array.from({ length: LIFE_EXPECTANCY_YEARS }, (_, y) => (
-                <div key={y} style={{
-                  height: SQ,
-                  fontSize: "8px",
-                  color: y % 5 === 0 ? "rgba(220, 200, 160, 0.98)" : "transparent",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  paddingRight: 5,
-                  minWidth: 32,
-                  fontFamily: "Courier New, monospace",
-                  userSelect: "none",
-                }}>{birthYear + y}</div>
-              ))}
-            </div>
+          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+            <div style={{ display: "inline-flex", flexDirection: "column" }}>
+            {Array.from({ length: LIFE_EXPECTANCY_YEARS }, (_, y) => {
+              const age      = y;
+              const rowA     = Array.from({ length: HALF }, (_, w) => y * WEEKS_PER_YEAR + w);
+              const rowB     = Array.from({ length: HALF }, (_, w) => y * WEEKS_PER_YEAR + HALF + w);
+              const showLabel = age % 5 === 0;
 
-            {/* squares */}
-            <div style={{ display: "flex", flexDirection: "column", gap: GAP, flexShrink: 0 }}>
-              {Array.from({ length: LIFE_EXPECTANCY_YEARS }, (_, y) => (
-                <div key={y} style={{ display: "flex", gap: GAP }}>
-                  {Array.from({ length: WEEKS_PER_YEAR }, (_, w) => {
-                    const idx = y * WEEKS_PER_YEAR + w;
-                    const isPast    = idx < weeksLived;
-                    const isCurrent = idx === weeksLived;
-                    const isFuture  = idx > weeksLived;
-                    return (
-                      <div
-                        key={w}
-                        title={isCurrent ? `You are here — week ${weeksLived + 1} of your life` : undefined}
-                        style={{
-                          width: SQ, height: SQ, borderRadius: 1, flexShrink: 0,
-                          background: isPast ? "#9a2a18" : "transparent",
-                          border: isCurrent
-                            ? "2px solid rgb(245, 51, 7)"
-                            : isFuture
-                              ? "1px solid rgba(220, 200, 160, 0.49)"
-                              : "none",
-                          animation: isCurrent ? "mm-pulse 1.6s ease-in-out infinite" : "none",
-                        }}
-                      />
-                    );
-                  })}
+              const allWeeks = Array.from({ length: WEEKS_PER_YEAR }, (_, w) => y * WEEKS_PER_YEAR + w);
+
+              return (
+                <div key={y} style={{ display: "flex", alignItems: "center", gap: GAP, marginBottom: GAP }}>
+                  <div
+                    className="lc-year-label"
+                    style={{ fontSize: "8px", color: showLabel ? "rgba(220,200,160,0.75)" : "transparent", minWidth: 36, textAlign: "right", paddingRight: 6, fontFamily: "Courier New,monospace", userSelect: "none", flexShrink: 0 }}
+                  >
+                    {showLabel ? birthYear + y : ""}
+                  </div>
+
+                  {/* desktop: 1 row of 52 */}
+                  <div className="lc-row-desktop" style={{ display: "flex", gap: GAP }}>
+                    {allWeeks.map((idx) => {
+                      const isPast    = idx < weeksLived;
+                      const isCurrent = idx === weeksLived;
+                      return (
+                        <div
+                          key={idx}
+                          className={isCurrent ? "lc-grid-sq lc-sq-current" : "lc-grid-sq"}
+                          title={isCurrent ? "Click for this week" : undefined}
+                          onClick={() => handleSquareClick(idx)}
+                          style={{
+                            width: SQ, height: SQ,
+                            borderRadius: 1,
+                            flexShrink: 0,
+                            background: isPast ? "#9a2a18" : "transparent",
+                            border: isCurrent ? "2px solid rgb(245,51,7)" : "1px solid rgba(220,200,160,0.2)",
+                            animation: isCurrent ? "mm-pulse 1.6s ease-in-out infinite" : "none",
+                            cursor: isCurrent ? "pointer" : "default",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  {/* mobile: 2 rows of 26 */}
+                  <div className="lc-row-mobile" style={{ display: "none", flexDirection: "column", gap: GAP }}>
+                    {[rowA, rowB].map((row, ri) => (
+                      <div key={ri} style={{ display: "flex", gap: GAP }}>
+                        {row.map((idx) => {
+                          const isPast    = idx < weeksLived;
+                          const isCurrent = idx === weeksLived;
+                          return (
+                            <div
+                              key={idx}
+                              className={isCurrent ? "lc-grid-sq lc-sq-current" : "lc-grid-sq"}
+                              title={isCurrent ? "Click for this week" : undefined}
+                              onClick={() => handleSquareClick(idx)}
+                              style={{
+                                width: SQ, height: SQ,
+                                borderRadius: 1,
+                                flexShrink: 0,
+                                background: isPast ? "#9a2a18" : "transparent",
+                                border: isCurrent ? "2px solid rgb(245,51,7)" : "1px solid rgba(220,200,160,0.2)",
+                                animation: isCurrent ? "mm-pulse 1.6s ease-in-out infinite" : "none",
+                                cursor: isCurrent ? "pointer" : "default",
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           </div>
+
+          <button className="lc-back" style={{ alignSelf: "center" }} onClick={onBack}>← back</button>
+
+          <div style={{ fontSize: "0.62rem", letterSpacing: "0.25em", color: "#c4b490", textAlign: "center", lineHeight: 2, alignSelf: "center" }}>
+            * MEMENTO MORI * TEMPUS FUGIT * CARPE DIEM *<br />
+            <span style={{ letterSpacing: "0.12em", fontSize: "0.58rem" }}>
+              made by{" "}
+              <Link href="https://artt-folio.vercel.app/" target="_self" rel="noopener noreferrer">
+                <span className="lc-face">pemba sherpa</span>
+              </Link>
+            </span>
+          </div>
         </div>
-
-        {/* back */}
-        <button className="lc-back" onClick={onBack}>← back</button>
-
-        {/* footer */}
-        <div style={{ fontSize: "0.65rem", letterSpacing: "0.28em", color: "#c4b490", textAlign: "center", lineHeight: 2 }}>
-          * MEMENTO MORI * TEMPUS FUGIT * CARPE DIEM *<br />
-          <span style={{ letterSpacing: "0.15em", fontSize: "0.62rem" }}>
-            made by{" "}
-            <Link href="https://artt-folio.vercel.app/" target="_self" rel="noopener noreferrer">
-              <span className="lc-face">pemba sherpa</span>
-            </Link>
-          </span>
-        </div>
-
       </div>
+
+      {activeWeek !== null && (
+        <WeekPopup
+          weekIndex={activeWeek}
+          birthTs={birthTs}
+          onClose={() => setActiveWeek(null)}
+        />
+      )}
     </div>
   );
 }
