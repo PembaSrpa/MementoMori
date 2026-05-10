@@ -568,7 +568,7 @@ const s = {
   back: { background: "transparent", border: "none", color: "var(--c-muted)", fontFamily: "var(--font-data)", fontSize: "0.68rem", letterSpacing: "0.15em", cursor: "pointer", transition: "color 0.2s", padding: "0.3rem" },
   calBtn: { background: "transparent", border: "1px solid var(--c-border)", color: "var(--c-mid)", fontFamily: "var(--font-data)", fontSize: "0.68rem", letterSpacing: "0.15em", cursor: "pointer", transition: "all 0.2s", padding: "0.3rem 0.8rem" },
   quote: { fontSize: "0.72rem", fontStyle: "italic", color: "var(--c-fg)", letterSpacing: "0.04em", maxWidth: 360, lineHeight: 2, fontFamily: "var(--font-display)" },
-  footer: { position: "relative", fontSize: "0.60rem", letterSpacing: "0.30em", color: "var(--c-mid)", zIndex: 6, marginTop: "1rem", paddingBottom: "1.5rem", textAlign: "center", lineHeight: 2, fontFamily: "var(--font-data)" },
+  footer: { position: "relative", fontSize: "0.60rem", letterSpacing: "0.30em", color: "var(--c-mid)", zIndex: 6, marginTop: "0.5rem", paddingBottom: "1.5rem", textAlign: "center", lineHeight: 2, fontFamily: "var(--font-data)" },
   footerBy: { letterSpacing: "0.15em", fontSize: "0.6rem" },
 };
 
