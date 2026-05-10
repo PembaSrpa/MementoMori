@@ -313,6 +313,19 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
 
   const [activeWeek, setActiveWeek] = useState(null);
   const quote = useMemo(() => QUOTES[Math.floor(Math.random() * QUOTES.length)], []);
+  
+  // 1. ADDED REF HERE
+  const currentWeekRef = useRef(null);
+
+  // 2. ADDED SCROLL EFFECT HERE
+  useEffect(() => {
+    if (currentWeekRef.current) {
+      currentWeekRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, []);
 
   const SQ  = 14;
   const GAP = 2;
@@ -412,6 +425,8 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
                       return (
                         <div
                           key={idx}
+                          // 3. ATTACHED REF HERE
+                          ref={isCurrent ? currentWeekRef : null}
                           className={isCurrent ? "lc-grid-sq lc-sq-current" : "lc-grid-sq"}
                           title={isCurrent ? "Click for this week" : undefined}
                           onClick={() => handleSquareClick(idx)}
@@ -439,6 +454,8 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
                           return (
                             <div
                               key={idx}
+                              // 4. ALSO ATTACHED REF HERE FOR MOBILE VIEW
+                              ref={isCurrent ? currentWeekRef : null}
                               className={isCurrent ? "lc-grid-sq lc-sq-current" : "lc-grid-sq"}
                               title={isCurrent ? "Click for this week" : undefined}
                               onClick={() => handleSquareClick(idx)}
