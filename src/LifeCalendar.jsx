@@ -425,8 +425,6 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
                       return (
                         <div
                           key={idx}
-                          // 3. ATTACHED REF HERE
-                          ref={isCurrent ? currentWeekRef : null}
                           className={isCurrent ? "lc-grid-sq lc-sq-current" : "lc-grid-sq"}
                           title={isCurrent ? "Click for this week" : undefined}
                           onClick={() => handleSquareClick(idx)}
