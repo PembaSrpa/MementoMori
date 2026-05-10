@@ -327,7 +327,7 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
     }
   }, []);
 
-  const SQ  = 14;
+  const SQ  = 12;
   const GAP = 2;
 
   const handleSquareClick = useCallback((idx) => {
