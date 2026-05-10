@@ -516,10 +516,6 @@ export default function MementoMori() {
               <button onClick={reset} style={s.back} className="back-btn">← begin again</button>
               <button onClick={goCalendar} style={s.calBtn} className="cal-btn">see your calendar →</button>
             </div>
-
-            <p style={s.quote}>
-              "The time which you give to another is taken from your life."
-            </p>
           </div>
         </div>
       )}
@@ -527,7 +523,7 @@ export default function MementoMori() {
       <div style={s.footer}>
         * MEMENTO MORI * TEMPUS FUGIT * CARPE DIEM *<br />
         <span style={s.footerBy}>made by <Link href="https://artt-folio.vercel.app/" target="_self" rel="noopener noreferrer">
-          <span className="face-btn">pemba sherpa</span>
+          <span className="face-btn">Pemba Sherpa</span>
         </Link></span>
       </div>
     </div>

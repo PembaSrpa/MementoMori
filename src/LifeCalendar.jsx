@@ -487,7 +487,7 @@ export default function LifeCalendar({ birthTs, deathTs, onBack }) {
             <span style={{ letterSpacing: "0.12em", fontSize: "0.58rem" }}>
               made by{" "}
               <Link href="https://artt-folio.vercel.app/" target="_self" rel="noopener noreferrer">
-                <span className="lc-face">pemba sherpa</span>
+                <span className="lc-face">Pemba Sherpa</span>
               </Link>
             </span>
           </div>
